@@ -1,0 +1,420 @@
+{
+  "site": {
+    "name": "Ifreelance4u",
+    "title": "Web Security Architect & Developer",
+    "description": "Expert Web Solutions Architect & Developer specializing in secure, compliant web applications. GDPR, HIPAA, PCI-DSS compliance expert.",
+    "keywords": "web security, compliance, GDPR, HIPAA, PCI-DSS, web development, cybersecurity, DevSecOps",
+    "author": "Ifreelance4u"
+  },
+  "navigation": [
+    {
+      "name": "Home",
+      "url": "index.html",
+      "icon": "bi-house-door"
+    },
+    {
+      "name": "About",
+      "url": "about.html",
+      "icon": "bi-person"
+    },
+    {
+      "name": "Services",
+      "url": "services.html",
+      "icon": "bi-briefcase"
+    },
+    {
+      "name": "Portfolio",
+      "url": "portfolio.html",
+      "icon": "bi-folder"
+    },
+    {
+      "name": "Contact",
+      "url": "contact.html",
+      "icon": "bi-envelope"
+    }
+  ],
+  "hero": {
+    "greeting": "Hello, I'm",
+    "name": "Ifreelance4u",
+    "tagline": "Web Security Architect & Developer",
+    "description": "Building secure, compliant, and scalable web applications that protect your data and exceed industry standards.",
+    "cta": {
+      "primary": {
+        "text": "View My Work",
+        "url": "portfolio.html"
+      },
+      "secondary": {
+        "text": "Get In Touch",
+        "url": "contact.html"
+      }
+    }
+  },
+  "expertise": [
+    {
+      "icon": "bi-shield-lock-fill",
+      "title": "Security First",
+      "description": "Implementing robust security measures including XSS protection, CSRF tokens, and CSP headers."
+    },
+    {
+      "icon": "bi-check2-circle",
+      "title": "Compliance Ready",
+      "description": "GDPR, HIPAA, PCI-DSS compliant solutions ensuring your business meets regulatory requirements."
+    },
+    {
+      "icon": "bi-code-slash",
+      "title": "Modern Stack",
+      "description": "Leveraging latest technologies and best practices for optimal performance and maintainability."
+    },
+    {
+      "icon": "bi-lightning-charge-fill",
+      "title": "Performance Optimized",
+      "description": "Fast, responsive applications with optimized assets and efficient code architecture."
+    }
+  ],
+  "stats": [
+    {
+      "number": "50+",
+      "label": "Projects Completed",
+      "icon": "bi-folder-check"
+    },
+    {
+      "number": "15+",
+      "label": "Years Experience",
+      "icon": "bi-calendar-check"
+    },
+    {
+      "number": "100%",
+      "label": "Client Satisfaction",
+      "icon": "bi-emoji-smile"
+    },
+    {
+      "number": "24/7",
+      "label": "Support Available",
+      "icon": "bi-headset"
+    }
+  ],
+  "about": {
+    "title": "About Me",
+    "subtitle": "Your Trusted Web Security Partner",
+    "introduction": "I'm a passionate Web Security Architect and Developer with over 15 years of experience in building secure, scalable, and compliant web applications. My expertise spans across full-stack development, cybersecurity, and regulatory compliance.",
+    "journey": {
+      "title": "My Journey",
+      "content": "Started as a junior developer in 2008, I quickly developed a passion for security and compliance. Over the years, I've worked with Fortune 500 companies, startups, and government agencies, helping them build secure digital solutions. My work has protected millions of users' data and helped organizations achieve compliance with major regulatory standards."
+    },
+    "drive": {
+      "title": "What Drives Me",
+      "content": "In an era where data breaches make headlines daily, I believe that security should never be an afterthought. My mission is to help businesses build trust with their users through robust security practices and transparent compliance measures. Every line of code I write is guided by the principle: 'Security by Design, Privacy by Default.'"
+    },
+    "expertise_areas": [
+      {
+        "category": "Security",
+        "skills": ["OWASP Top 10", "XSS Prevention", "CSRF Protection", "Security Audits", "Penetration Testing", "Secure Code Review"]
+      },
+      {
+        "category": "Compliance",
+        "skills": ["GDPR", "HIPAA", "PCI-DSS", "SOC 2", "ISO 27001", "Data Privacy"]
+      },
+      {
+        "category": "Development",
+        "skills": ["Full-Stack Development", "RESTful APIs", "Microservices", "Cloud Architecture", "DevSecOps", "CI/CD"]
+      },
+      {
+        "category": "Technologies",
+        "skills": ["JavaScript/Node.js", "Python", "PHP", "React", "Vue.js", "Docker", "Kubernetes", "AWS/Azure"]
+      }
+    ],
+    "sal_framework": {
+      "title": "SAL Framework",
+      "subtitle": "Security, Accessibility, Longevity",
+      "description": "My proprietary development approach that ensures every project is:",
+      "pillars": [
+        {
+          "letter": "S",
+          "word": "Secure",
+          "description": "Built with security best practices from day one",
+          "icon": "bi-shield-lock-fill"
+        },
+        {
+          "letter": "A",
+          "word": "Accessible",
+          "description": "Inclusive design that works for everyone",
+          "icon": "bi-universal-access"
+        },
+        {
+          "letter": "L",
+          "word": "Long-lasting",
+          "description": "Maintainable, scalable solutions that grow with you",
+          "icon": "bi-infinity"
+        }
+      ]
+    }
+  },
+  "services": [
+    {
+      "id": "web-security",
+      "icon": "bi-shield-lock-fill",
+      "title": "Web Security Audits",
+      "shortDescription": "Comprehensive security assessments to identify and fix vulnerabilities.",
+      "fullDescription": "In-depth security audits covering OWASP Top 10, vulnerability scanning, penetration testing, and detailed remediation guidance. Includes code review, configuration analysis, and compliance checking.",
+      "features": [
+        "OWASP Top 10 vulnerability assessment",
+        "Penetration testing and ethical hacking",
+        "Security code review",
+        "Configuration and infrastructure audit",
+        "Detailed remediation report",
+        "Post-fix verification testing"
+      ],
+      "pricing": "Starting at $2,500",
+      "timeline": "2-4 weeks"
+    },
+    {
+      "id": "compliance",
+      "icon": "bi-check2-circle",
+      "title": "Compliance Consulting",
+      "shortDescription": "Expert guidance for GDPR, HIPAA, PCI-DSS, and other regulatory compliance.",
+      "fullDescription": "Navigate complex regulatory requirements with confidence. I provide comprehensive compliance consulting, gap analysis, implementation guidance, and ongoing support to ensure your organization meets all regulatory obligations.",
+      "features": [
+        "Compliance gap analysis",
+        "Policy and procedure development",
+        "Technical implementation guidance",
+        "Staff training and awareness",
+        "Audit preparation and support",
+        "Ongoing compliance monitoring"
+      ],
+      "pricing": "Starting at $3,000",
+      "timeline": "4-8 weeks"
+    },
+    {
+      "id": "web-development",
+      "icon": "bi-code-slash",
+      "title": "Secure Web Development",
+      "shortDescription": "Custom web applications built with security and compliance at the core.",
+      "fullDescription": "Full-stack web development services with security baked in from the start. From simple websites to complex web applications, every project follows security best practices and coding standards.",
+      "features": [
+        "Full-stack development (Frontend & Backend)",
+        "RESTful API development",
+        "Database design and optimization",
+        "Authentication and authorization systems",
+        "Secure payment integration",
+        "Cloud deployment and DevOps"
+      ],
+      "pricing": "Starting at $5,000",
+      "timeline": "6-12 weeks"
+    },
+    {
+      "id": "devsecops",
+      "icon": "bi-gear-fill",
+      "title": "DevSecOps Implementation",
+      "shortDescription": "Integrate security into your development pipeline for continuous protection.",
+      "fullDescription": "Implement DevSecOps practices to automate security testing and ensure every code change is secure. I'll help you set up CI/CD pipelines with integrated security tools, vulnerability scanning, and automated compliance checks.",
+      "features": [
+        "CI/CD pipeline setup with security integration",
+        "Automated security testing (SAST, DAST)",
+        "Container security and orchestration",
+        "Infrastructure as Code (IaC) security",
+        "Secrets management",
+        "Security monitoring and alerting"
+      ],
+      "pricing": "Starting at $4,000",
+      "timeline": "4-6 weeks"
+    },
+    {
+      "id": "training",
+      "icon": "bi-book-fill",
+      "title": "Security Training",
+      "shortDescription": "Empower your team with security awareness and secure coding practices.",
+      "fullDescription": "Comprehensive security training programs tailored to your team's needs. From general security awareness to advanced secure coding techniques, I provide hands-on training that makes a real difference.",
+      "features": [
+        "Security awareness training",
+        "Secure coding workshops",
+        "OWASP Top 10 deep-dive",
+        "Compliance training (GDPR, HIPAA, etc.)",
+        "Incident response training",
+        "Customized training programs"
+      ],
+      "pricing": "Starting at $1,500",
+      "timeline": "1-3 days"
+    },
+    {
+      "id": "consultation",
+      "icon": "bi-chat-dots-fill",
+      "title": "Technical Consultation",
+      "shortDescription": "Expert advice on architecture, security, and technology decisions.",
+      "fullDescription": "Get expert guidance on technical decisions, architecture design, technology selection, and security strategy. Available for one-time consultations or ongoing advisory relationships.",
+      "features": [
+        "Architecture review and design",
+        "Technology stack selection",
+        "Security strategy development",
+        "Performance optimization",
+        "Code review and best practices",
+        "Team mentoring"
+      ],
+      "pricing": "$200/hour",
+      "timeline": "Flexible"
+    }
+  ],
+  "portfolio": [
+    {
+      "id": 1,
+      "title": "Healthcare Portal - HIPAA Compliant",
+      "category": "healthcare",
+      "tags": ["HIPAA", "Security", "Full-Stack"],
+      "description": "Developed a secure patient portal for a healthcare provider, ensuring full HIPAA compliance with encrypted data storage, secure messaging, and audit logging.",
+      "image": "https://via.placeholder.com/600x400/007bff/ffffff?text=Healthcare+Portal",
+      "technologies": ["Node.js", "React", "PostgreSQL", "AWS"],
+      "highlights": [
+        "End-to-end encryption for patient data",
+        "HIPAA-compliant audit logging",
+        "Secure messaging system",
+        "Role-based access control",
+        "Two-factor authentication"
+      ],
+      "year": 2023
+    },
+    {
+      "id": 2,
+      "title": "E-Commerce Platform - PCI-DSS",
+      "category": "ecommerce",
+      "tags": ["PCI-DSS", "Payment Security", "API"],
+      "description": "Built a secure e-commerce platform with PCI-DSS compliant payment processing, fraud detection, and secure checkout flow.",
+      "image": "https://via.placeholder.com/600x400/28a745/ffffff?text=E-Commerce+Platform",
+      "technologies": ["Node.js", "Vue.js", "MongoDB", "Stripe API"],
+      "highlights": [
+        "PCI-DSS Level 1 compliance",
+        "Tokenized payment processing",
+        "Advanced fraud detection",
+        "Secure session management",
+        "Real-time inventory tracking"
+      ],
+      "year": 2023
+    },
+    {
+      "id": 3,
+      "title": "Financial Dashboard - SOC 2",
+      "category": "finance",
+      "tags": ["SOC 2", "Security", "Analytics"],
+      "description": "Created a financial analytics dashboard with SOC 2 compliance, real-time data processing, and comprehensive security controls.",
+      "image": "https://via.placeholder.com/600x400/ffc107/ffffff?text=Financial+Dashboard",
+      "technologies": ["Python", "React", "PostgreSQL", "Docker"],
+      "highlights": [
+        "SOC 2 Type II compliance",
+        "Real-time financial analytics",
+        "Advanced encryption at rest and in transit",
+        "Comprehensive audit trails",
+        "Multi-tenant architecture"
+      ],
+      "year": 2022
+    },
+    {
+      "id": 4,
+      "title": "Enterprise GDPR Suite",
+      "category": "enterprise",
+      "tags": ["GDPR", "Privacy", "Full-Stack"],
+      "description": "Developed a comprehensive GDPR compliance suite for enterprise clients, including data mapping, consent management, and privacy dashboards.",
+      "image": "https://via.placeholder.com/600x400/dc3545/ffffff?text=GDPR+Compliance+Suite",
+      "technologies": ["Node.js", "Angular", "MySQL", "Azure"],
+      "highlights": [
+        "Complete GDPR compliance framework",
+        "Data subject access request automation",
+        "Consent management system",
+        "Data mapping and discovery",
+        "Privacy impact assessments"
+      ],
+      "year": 2022
+    },
+    {
+      "id": 5,
+      "title": "API Security Gateway",
+      "category": "security",
+      "tags": ["API Security", "Microservices", "DevSecOps"],
+      "description": "Built a secure API gateway with rate limiting, authentication, encryption, and comprehensive security monitoring for microservices architecture.",
+      "image": "https://via.placeholder.com/600x400/17a2b8/ffffff?text=API+Gateway",
+      "technologies": ["Node.js", "Kong", "Redis", "Kubernetes"],
+      "highlights": [
+        "OAuth 2.0 and JWT authentication",
+        "Rate limiting and DDoS protection",
+        "API encryption and validation",
+        "Real-time security monitoring",
+        "Automated threat response"
+      ],
+      "year": 2023
+    },
+    {
+      "id": 6,
+      "title": "Educational Platform",
+      "category": "education",
+      "tags": ["Security", "Full-Stack", "Cloud"],
+      "description": "Developed a secure online learning platform with user authentication, content management, and protected course materials.",
+      "image": "https://via.placeholder.com/600x400/6f42c1/ffffff?text=Learning+Platform",
+      "technologies": ["Node.js", "React", "MongoDB", "AWS S3"],
+      "highlights": [
+        "Secure content delivery",
+        "User progress tracking",
+        "Interactive assessments",
+        "Video encryption and DRM",
+        "Multi-language support"
+      ],
+      "year": 2022
+    }
+  ],
+  "social": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/ifreelance4u",
+      "icon": "bi-github"
+    },
+    {
+      "name": "LinkedIn",
+      "url": "https://linkedin.com/in/ifreelance4u",
+      "icon": "bi-linkedin"
+    },
+    {
+      "name": "Twitter",
+      "url": "https://twitter.com/ifreelance4u",
+      "icon": "bi-twitter"
+    },
+    {
+      "name": "Email",
+      "url": "mailto:contact@ifreelance4u.com",
+      "icon": "bi-envelope-fill"
+    }
+  ],
+  "contact": {
+    "title": "Get In Touch",
+    "subtitle": "Let's Build Something Secure Together",
+    "description": "Have a project in mind? Need security consulting? I'd love to hear from you. Fill out the form below and I'll get back to you within 24 hours.",
+    "info": [
+      {
+        "icon": "bi-envelope-fill",
+        "title": "Email",
+        "value": "contact@ifreelance4u.com",
+        "link": "mailto:contact@ifreelance4u.com"
+      },
+      {
+        "icon": "bi-geo-alt-fill",
+        "title": "Location",
+        "value": "Available Worldwide",
+        "link": null
+      },
+      {
+        "icon": "bi-clock-fill",
+        "title": "Response Time",
+        "value": "Within 24 hours",
+        "link": null
+      }
+    ]
+  },
+  "footer": {
+    "copyright": "© 2024 Ifreelance4u. All rights reserved.",
+    "links": [
+      {
+        "name": "Privacy Policy",
+        "url": "#privacy"
+      },
+      {
+        "name": "Terms of Service",
+        "url": "#terms"
+      }
+    ]
+  }
+}
