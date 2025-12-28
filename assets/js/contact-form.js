@@ -17,10 +17,25 @@ class ContactFormHandler {
 
     /**
      * Sanitize input
+     * Escapes special HTML characters to mitigate XSS when rendering user input.
      */
     sanitizeInput(input) {
         if (typeof input !== 'string') return '';
-        return input.trim().replace(/[<>]/g, '');
+
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '/': '&#x2F;'
+        };
+
+        return input
+            .trim()
+            .replace(/[&<>"'\/]/g, function (ch) {
+                return map[ch] || ch;
+            });
     }
 
     /**
