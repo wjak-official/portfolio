@@ -151,8 +151,10 @@
 
     // Validate email
     function isValidEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
+        const input = document.createElement('input');
+        input.type = 'email';
+        input.value = email;
+        return input.checkValidity();
     }
 
     // Form validation helper
