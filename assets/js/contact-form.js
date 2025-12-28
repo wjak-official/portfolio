@@ -42,8 +42,19 @@ class ContactFormHandler {
      * Validate email format
      */
     isValidEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return re.test(email);
+        if (typeof email !== 'string') {
+            return false;
+        }
+
+        const value = email.trim();
+        if (value === '') {
+            return false;
+        }
+
+        // More robust email validation with support for internationalized domains.
+        // Based on commonly used patterns (e.g., MDN) and extended for Unicode domain labels.
+        const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Za-z0-9\u00A1-\uFFFF](?:[A-Za-z0-9\u00A1-\uFFFF-]{0,61}[A-Za-z0-9\u00A1-\uFFFF])?\.)+[A-Za-z\u00A1-\uFFFF]{2,}$/u;
+        return re.test(value);
     }
 
     /**
