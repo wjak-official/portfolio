@@ -145,7 +145,8 @@
     // Input sanitization
     function sanitizeInput(input) {
         if (typeof input !== 'string') return '';
-        return input.trim().replace(/[<>]/g, '');
+        const trimmed = input.trim();
+        return escapeHtml(trimmed);
     }
 
     // Validate email
