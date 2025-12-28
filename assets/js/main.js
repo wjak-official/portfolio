@@ -6,18 +6,18 @@
  */
 
 (function() {
-    // Security: Generate CSRF token
-    function generateCSRFToken() {
+    // Generate a random client-side identifier (not CSRF protection)
+    function generateClientSessionId() {
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);
         return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
     }
 
-    // Store CSRF token
-    function initCSRF() {
-        if (!sessionStorage.getItem('csrf_token')) {
-            const token = generateCSRFToken();
-            sessionStorage.setItem('csrf_token', token);
+    // Initialize client-side identifier in sessionStorage
+    function initClientSessionId() {
+        if (!sessionStorage.getItem('client_session_id')) {
+            const token = generateClientSessionId();
+            sessionStorage.setItem('client_session_id', token);
         }
     }
 
