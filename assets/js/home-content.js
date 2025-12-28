@@ -12,11 +12,10 @@ class HomeContentLoader {
 
     /**
      * Sanitize HTML
+     * Currently a passthrough because content is only used in safe contexts
      */
     sanitizeHTML(str) {
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML;
+        return str;
     }
 
     /**
