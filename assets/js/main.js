@@ -133,14 +133,13 @@
     // Sanitization helper using DOMPurify
     function sanitizeText(text) {
         if (typeof text !== 'string') return '';
-        return DOMPurify.sanitize(str, {
+        return DOMPurify.sanitize(text, {
             ALLOWED_TAGS: [],
             ALLOWED_ATTR: [],
             KEEP_CONTENT: true,
             RETURN_TRUSTED_TYPE: false,
             USE_PROFILES: { html: false }
           });
-          
     }
 
     // Input sanitization
@@ -242,7 +241,6 @@
         updateActiveNavLink();
         initScrollAnimations();
         initBackToTop();
-        securityWarning();
     }
 
     // Export utilities for other scripts

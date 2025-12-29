@@ -6,6 +6,15 @@
  */
 
 class ContactFormHandler {
+    static DISPOSABLE_DOMAINS = [
+        '10minutemail.com', 'guerrillamail.com', 'mailinator.com',
+        'temp-mail.org', 'throwaway.email', 'yopmail.com',
+        'maildrop.cc', 'tempail.com', 'dispostable.com',
+        'mail-temporaire.fr', 'temp-mail.ru', 'tempemail.net',
+        'mailcatch.com', 'fakeinbox.com', 'mailnull.com',
+        'spamgourmet.com', 'spamhole.com', 'tempinbox.com'
+    ];
+
     constructor() {
         this.formElement = null;
         this.submitButton = null;
@@ -20,14 +29,13 @@ class ContactFormHandler {
      */
     sanitizeInput(input) {
         if (typeof input !== 'string') return '';
-        return DOMPurify.sanitize(str, {
+        return DOMPurify.sanitize(input, {
             ALLOWED_TAGS: [],
             ALLOWED_ATTR: [],
             KEEP_CONTENT: true,
             RETURN_TRUSTED_TYPE: false,
             USE_PROFILES: { html: false }
-          });
-          
+        });
     }
 
     /**
@@ -53,16 +61,8 @@ class ContactFormHandler {
 
         // Check for disposable/temp email domains
         const domain = value.split('@')[1]?.toLowerCase();
-        const disposableDomains = [
-            '10minutemail.com', 'guerrillamail.com', 'mailinator.com',
-            'temp-mail.org', 'throwaway.email', 'yopmail.com',
-            'maildrop.cc', 'tempail.com', 'dispostable.com',
-            'mail-temporaire.fr', 'temp-mail.ru', 'tempemail.net',
-            'mailcatch.com', 'fakeinbox.com', 'mailnull.com',
-            'spamgourmet.com', 'spamhole.com', 'tempinbox.com'
-        ];
 
-        return !disposableDomains.includes(domain);
+        return !ContactFormHandler.DISPOSABLE_DOMAINS.includes(domain);
     }
 
     /**
@@ -123,13 +123,34 @@ class ContactFormHandler {
             }
             
             // Validate email
-            if (field.type === 'email' && !this.isValidEmail(value)) {
-                isValid = false;
-                field.classList.add('is-invalid');
-                if (feedbackElement) {
-                    feedbackElement.textContent = 'Please enter a valid email address. Temporary/disposable email addresses are not allowed.';
+            if (field.type === 'email') {
+                // More robust email validation with support for internationalized domains.
+                const emailFormatRe = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Za-z0-9\u00A1-\uFFFF](?:[A-Za-z0-9\u00A1-\uFFFF-]{0,61}[A-Za-z0-9\u00A1-\uFFFF])?\.)+[A-Za-z\u00A1-\uFFFF]{2,}$/u;
+                const domain = value.split('@')[1]?.toLowerCase();
+                const disposableDomains = [
+                    '10minutemail.com', 'guerrillamail.com', 'mailinator.com',
+                    'temp-mail.org', 'throwaway.email', 'yopmail.com',
+                    'maildrop.cc', 'tempail.com', 'dispostable.com',
+                    'mail-temporaire.fr', 'temp-mail.ru', 'tempemail.net',
+                    'mailcatch.com', 'fakeinbox.com', 'mailnull.com',
+                    'spamgourmet.com', 'spamhole.com', 'tempinbox.com'
+                ];
+
+                if (!emailFormatRe.test(value)) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                    if (feedbackElement) {
+                        feedbackElement.textContent = 'Please enter a valid email address.';
+                    }
+                    return;
+                } else if (disposableDomains.includes(domain)) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                    if (feedbackElement) {
+                        feedbackElement.textContent = 'Temporary/disposable email addresses are not allowed.';
+                    }
+                    return;
                 }
-                return;
             }
             
             // Validate length
@@ -259,8 +280,8 @@ class ContactFormHandler {
             // Record submission for rate limiting
             this.recordSubmission();
             
-            // Show success message
-            this.showMessage(result.message, 'success');
+            // Show fixed success message to prevent XSS
+            this.showMessage('Thank you for your message. We will get back to you soon!', 'success');
             
             // Reset form
             this.formElement.reset();
