@@ -21,12 +21,17 @@ class ComponentLoader {
     }
 
     /**
-     * Sanitize HTML to prevent XSS
+     * Sanitize HTML to prevent XSS using DOMPurify
      */
     sanitizeHTML(str) {
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML;
+        return DOMPurify.sanitize(str, {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+            KEEP_CONTENT: true,
+            RETURN_TRUSTED_TYPE: false,
+            USE_PROFILES: { html: false }
+          });
+          
     }
 
     /**

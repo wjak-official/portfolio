@@ -125,28 +125,29 @@
         element.innerHTML = `
             <div class="alert alert-danger" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                ${escapeHtml(message)}
+                ${sanitizeText(message)}
             </div>
         `;
     }
 
-    // Sanitization helper
-    function escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, m => map[m]);
+    // Sanitization helper using DOMPurify
+    function sanitizeText(text) {
+        if (typeof text !== 'string') return '';
+        return DOMPurify.sanitize(str, {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+            KEEP_CONTENT: true,
+            RETURN_TRUSTED_TYPE: false,
+            USE_PROFILES: { html: false }
+          });
+          
     }
 
     // Input sanitization
     function sanitizeInput(input) {
         if (typeof input !== 'string') return '';
         const trimmed = input.trim();
-        return escapeHtml(trimmed);
+        return sanitizeText(trimmed);
     }
 
     // Validate email
@@ -212,11 +213,25 @@
         });
     }
 
-    // Console warning for security
-    function securityWarning() {
-        console.log('%cWarning!', 'color: red; font-size: 40px; font-weight: bold;');
-        console.log('%cThis is a browser feature intended for developers.', 'font-size: 16px;');
-        console.log('%cIf someone told you to copy-paste something here, it could compromise your security.', 'font-size: 16px;');
+    // Initialize CSRF token from server
+    async function initCSRF() {
+        try {
+            const response = await fetch('/api/csrf-token');
+            if (response.ok) {
+                const data = await response.json();
+                sessionStorage.setItem('csrf_token', data.csrfToken);
+            } else {
+                // Fallback to client-generated token if server is not available
+                console.warn('CSRF token server not available, using client-generated token');
+                const token = generateClientSessionId();
+                sessionStorage.setItem('csrf_token', token);
+            }
+        } catch (error) {
+            console.warn('Failed to fetch CSRF token:', error);
+            // Fallback to client-generated token
+            const token = generateClientSessionId();
+            sessionStorage.setItem('csrf_token', token);
+        }
     }
 
     // Initialize all features
@@ -232,7 +247,7 @@
 
     // Export utilities for other scripts
     window.AppUtils = {
-        escapeHtml,
+        sanitizeText,
         sanitizeInput,
         isValidEmail,
         validateForm,

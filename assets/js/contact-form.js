@@ -16,30 +16,22 @@ class ContactFormHandler {
     }
 
     /**
-     * Sanitize input
-     * Escapes special HTML characters to mitigate XSS when rendering user input.
+     * Sanitize input using DOMPurify
      */
     sanitizeInput(input) {
         if (typeof input !== 'string') return '';
-
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;',
-            '/': '&#x2F;'
-        };
-
-        return input
-            .trim()
-            .replace(/[&<>"'\/]/g, function (ch) {
-                return map[ch] || ch;
-            });
+        return DOMPurify.sanitize(str, {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+            KEEP_CONTENT: true,
+            RETURN_TRUSTED_TYPE: false,
+            USE_PROFILES: { html: false }
+          });
+          
     }
 
     /**
-     * Validate email format
+     * Validate email format and check for disposable domains
      */
     isValidEmail(email) {
         if (typeof email !== 'string') {
@@ -54,7 +46,23 @@ class ContactFormHandler {
         // More robust email validation with support for internationalized domains.
         // Based on commonly used patterns (e.g., MDN) and extended for Unicode domain labels.
         const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Za-z0-9\u00A1-\uFFFF](?:[A-Za-z0-9\u00A1-\uFFFF-]{0,61}[A-Za-z0-9\u00A1-\uFFFF])?\.)+[A-Za-z\u00A1-\uFFFF]{2,}$/u;
-        return re.test(value);
+
+        if (!re.test(value)) {
+            return false;
+        }
+
+        // Check for disposable/temp email domains
+        const domain = value.split('@')[1]?.toLowerCase();
+        const disposableDomains = [
+            '10minutemail.com', 'guerrillamail.com', 'mailinator.com',
+            'temp-mail.org', 'throwaway.email', 'yopmail.com',
+            'maildrop.cc', 'tempail.com', 'dispostable.com',
+            'mail-temporaire.fr', 'temp-mail.ru', 'tempemail.net',
+            'mailcatch.com', 'fakeinbox.com', 'mailnull.com',
+            'spamgourmet.com', 'spamhole.com', 'tempinbox.com'
+        ];
+
+        return !disposableDomains.includes(domain);
     }
 
     /**
@@ -119,7 +127,7 @@ class ContactFormHandler {
                 isValid = false;
                 field.classList.add('is-invalid');
                 if (feedbackElement) {
-                    feedbackElement.textContent = 'Please enter a valid email address.';
+                    feedbackElement.textContent = 'Please enter a valid email address. Temporary/disposable email addresses are not allowed.';
                 }
                 return;
             }
@@ -245,15 +253,14 @@ class ContactFormHandler {
         };
         
         try {
-            // In production, this would make an actual API call
-            // For now, simulate the submission
-            await this.simulateSubmission(formData);
+            // Submit to server
+            const result = await this.submitToServer(formData);
             
             // Record submission for rate limiting
             this.recordSubmission();
             
             // Show success message
-            this.showMessage('Thank you for your message! I will get back to you within 24 hours.', 'success');
+            this.showMessage(result.message, 'success');
             
             // Reset form
             this.formElement.reset();
@@ -273,33 +280,29 @@ class ContactFormHandler {
     }
 
     /**
-     * Simulate form submission (replace with actual API call in production)
+     * Submit form to server
      */
-    async simulateSubmission(data) {
-        // Simulate network delay
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log('Form data:', data);
-                resolve();
-            }, 1500);
-        });
-        
-        /* Production implementation would look like:
+    async submitToServer(formData) {
         const response = await fetch('/api/contact', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': data.csrf_token
+                'X-CSRF-Token': formData.csrf_token
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message
+            })
         });
-        
+
         if (!response.ok) {
-            throw new Error('Submission failed');
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Submission failed');
         }
-        
+
         return await response.json();
-        */
     }
 
     /**

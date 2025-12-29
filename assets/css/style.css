@@ -664,6 +664,24 @@ footer a:hover {
     margin-bottom: 3rem;
 }
 
+/* Main content spacing */
+#main-content {
+    margin-top: 56px;
+}
+
+/* Hero section specific styles */
+.hero-section {
+    margin-top: 56px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Form message display */
+#formMessage {
+    display: none;
+}
+
 /* Honeypot field - hidden from users but visible to bots */
 .hp-field {
     position: absolute;
