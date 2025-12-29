@@ -11,12 +11,10 @@ class AboutContentLoader {
     }
 
     /**
-     * Sanitize HTML
+     * Sanitize HTML using DOMPurify
      */
     sanitizeHTML(str) {
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML;
+        return DOMPurify.sanitize(str, { ALLOWED_TAGS: [] });
     }
 
     /**
