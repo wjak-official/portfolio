@@ -2,16 +2,48 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const { doubleCsrf } = require('csurf-csrf');
+
+// Rate limiting
+const generalLimiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15 minutes
+    max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
+    message: 'Too many requests from this IP, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const contactLimiter = rateLimit({
+    windowMs: parseInt(process.env.CONTACT_RATE_LIMIT_WINDOW) || 60 * 60 * 1000, // 1 hour
+    max: parseInt(process.env.CONTACT_RATE_LIMIT_MAX) || 3,
+    message: 'Too many contact form submissions, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const { doubleCsrf } = require('csrf-csrf');
 const cookieParser = require('cookie-parser');
 const { body, validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
+const compression = require('compression');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+
+// Create logs directory if it doesn't exist
+const logsDir = path.join(__dirname, 'logs');
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+}
+
+// Compression middleware
+app.use(compression({
+    level: parseInt(process.env.COMPRESSION_LEVEL) || 6,
+    threshold: 1024
+}));
 
 // Security middleware
 app.use(helmet({
@@ -26,9 +58,9 @@ app.use(helmet({
         }
     },
     hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true
+        maxAge: parseInt(process.env.HSTS_MAX_AGE) || 31536000,
+        includeSubDomains: process.env.HSTS_INCLUDE_SUBDOMAINS === 'true',
+        preload: process.env.HSTS_PRELOAD === 'true'
     }
 }));
 
@@ -72,23 +104,6 @@ const {
     ignoredMethods: ['GET', 'HEAD', 'OPTIONS']
 });
 
-// Rate limiting
-const generalLimiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 15 * 60 * 1000, // 15 minutes
-    max: 100,
-    message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
-const contactLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 3,
-    message: 'Too many contact form submissions, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
-
 app.use('/api/', generalLimiter);
 
 // Serve static files
@@ -97,7 +112,7 @@ app.use(express.static(path.join(__dirname)));
 // Email transporter
 let transporter;
 if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
-    transporter = nodemailer.createTransporter({
+    transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: parseInt(process.env.SMTP_PORT) || 465,
         secure: true,
@@ -287,12 +302,15 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+    console.log(`🚀 Server running on ${HOST}:${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📧 Email service: ${transporter ? 'configured' : 'not configured'}`);
     console.log(`🔒 CSRF protection: enabled`);
     console.log(`🛡️  Rate limiting: enabled`);
+    console.log(`📊 General rate limit: ${process.env.RATE_LIMIT_MAX || 100} requests per ${Math.floor((process.env.RATE_LIMIT_WINDOW || 900000) / 60000)} minutes`);
+    console.log(`📧 Contact rate limit: ${process.env.CONTACT_RATE_LIMIT_MAX || 3} submissions per ${Math.floor((process.env.CONTACT_RATE_LIMIT_WINDOW || 3600000) / 3600000)} hour`);
+    console.log(`🔐 HTTPS enforcement: ${process.env.FORCE_HTTPS === 'true' ? 'enabled' : 'disabled'}`);
 });
 
 module.exports = app;

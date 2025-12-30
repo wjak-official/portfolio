@@ -4030,7 +4030,164 @@ console.log(`Server running on port ${PORT}`);
 ---
 ## 🔒 21. Security Implementation Guide
 
-[Welcome to Notion!](https://www.notion.so/Welcome-to-Notion-2cce56e1a6a880728488fe7433643669?pvs=21)
+---
+
+## 🐳 Docker Deployment
+
+### Hybrid Deployment: GitHub Pages + Docker API
+
+For the best of both worlds, you can deploy a **hybrid setup** where:
+- **Static content** stays on **GitHub Pages** (`uat.ifreelance4u.com`)
+- **API backend** runs locally in **Docker** (`api.ifreelance4u.com`)
+
+This gives you fast static delivery + full server-side functionality!
+
+📖 **[Complete Hybrid Setup Guide](HYBRID_DEPLOYMENT.md)**
+
+### Production Deployment with Let's Encrypt SSL
+
+1. **Clone and configure:**
+   ```bash
+   git clone https://github.com/yourusername/portfolio.git
+   cd portfolio
+   cp .env.example .env
+   ```
+
+2. **Update environment variables:**
+   ```bash
+   # Edit .env with your actual values
+   nano .env
+   ```
+
+3. **Update domain configuration:**
+   ```bash
+   # The domain is already configured for: uat.ifreelance4u.com
+   # Update these files if you need a different domain:
+   # - docker-compose.yml (certbot command)
+   # - nginx.conf (server_name directives)
+   # - ssl-renew.sh (DOMAIN and EMAIL variables)
+   # - .env (DOMAIN, WWW_DOMAIN, SSL_EMAIL)
+   ```
+
+4. **Deploy using the automated script:**
+   ```bash
+# Make the script executable and run deployment
+chmod +x deploy.sh
+./deploy.sh
+
+# Cross-platform alternative:
+./deploy   # The script will automatically:
+   # - Generate cryptographically secure secrets for SESSION_SECRET and CSRF_SECRET
+   # - Create the .env file with production-ready configuration
+   # - Create backups of existing .env files (if any)
+   # - Setup SSL certificates for development
+   # - Start all Docker services
+   ```
+
+5. **Configure email settings:**
+   ```bash
+   # Edit the generated .env file to add your email credentials
+   nano .env
+   
+   # Update these required fields:
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-specific-password
+   ```
+
+6. **Setup production SSL certificates:**
+   ```bash
+   # Point your domain DNS to this server, then:
+   sudo ./deploy.sh ssl-issue
+   sudo ./deploy.sh setup-renewal
+   ```
+
+### Development Deployment
+
+1. **Generate self-signed certificates:**
+   ```bash
+   # Generate development SSL certificates
+   openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+   ```
+
+2. **Start development environment:**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the application:**
+   - HTTP: http://localhost
+   - HTTPS: https://localhost (will show certificate warning)
+
+### Docker Security Features
+
+- **Non-root containers** with dedicated user
+- **Read-only filesystems** with tmpfs for temporary data
+- **Security options** preventing privilege escalation
+- **Resource limits** to prevent abuse
+- **Health checks** for automatic recovery
+- **Nginx reverse proxy** with security hardening
+- **Rate limiting** and DDoS protection
+- **Let's Encrypt** automatic SSL certificate management
+
+### Testing Secret Generation
+
+Before deployment, you can test the secret generation:
+
+```bash
+# Linux/macOS:
+chmod +x test-secrets.sh
+./test-secrets.sh
+
+# Windows (PowerShell):
+.\test-secrets.ps1
+```
+
+This will verify that cryptographically secure secrets can be generated on your system.
+
+### PowerShell Scripts for Windows
+
+For Windows users, PowerShell equivalents are available:
+
+- `deploy.ps1` - Main deployment script
+- `ssl-renew.ps1` - SSL certificate management
+- `test-secrets.ps1` - Secret generation testing
+
+**Usage:**
+```powershell
+# Full deployment
+.\deploy.ps1
+
+# SSL certificate management
+.\ssl-renew.ps1 -Command issue
+.\ssl-renew.ps1 -Command check
+
+# Test secret generation
+.\test-secrets.ps1
+```
+
+All PowerShell scripts include proper administrator privilege checking and Windows-specific implementations.
+
+```bash
+# Use the deployment script for common operations
+./deploy.sh status          # Check deployment status
+./deploy.sh logs           # Show service logs
+./deploy.sh restart        # Restart services
+
+# Or use docker-compose directly
+docker-compose logs -f
+
+# Check container health
+docker-compose ps
+
+# Restart services
+docker-compose restart
+
+# Rebuild after code changes
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+---
 
 ## 🛠️ Backend Setup Guide
 

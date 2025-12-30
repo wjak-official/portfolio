@@ -215,7 +215,7 @@
     // Initialize CSRF token from server
     async function initCSRF() {
         try {
-            const response = await fetch('/api/csrf-token');
+            const response = await fetch('https://api.ifreelance4u.com/api/csrf-token');
             if (response.ok) {
                 const data = await response.json();
                 sessionStorage.setItem('csrf_token', data.csrfToken);

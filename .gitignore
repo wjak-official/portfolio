@@ -31,3 +31,5 @@ build/
 tmp/
 temp/
 *.tmp
+ssl/cert.pem
+ssl/key.pem

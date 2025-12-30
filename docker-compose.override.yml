@@ -1,0 +1,19 @@
+# Development override - uses self-signed certificates
+# This file is automatically merged with docker-compose.yml in development
+
+services:
+  portfolio:
+    depends_on: []
+
+  nginx:
+    volumes:
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - portfolio
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+
+  # Remove certbot service in development
+  certbot:
+    profiles:
+      - production
