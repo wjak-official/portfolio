@@ -10,6 +10,8 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+.env.backup.*
+.env.*.backup
 
 # IDE
 .vscode/
@@ -27,9 +29,17 @@ logs/
 dist/
 build/
 
-# Temporary files
-tmp/
-temp/
-*.tmp
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# SSL certificates (development)
 ssl/cert.pem
 ssl/key.pem
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
