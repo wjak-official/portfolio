@@ -1,0 +1,112 @@
+#!/bin/bash
+# Cross-platform deployment script
+# Automatically detects the environment and runs the appropriate deployment
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log() {
+    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+}
+
+info() {
+    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+}
+
+error() {
+    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}" >&2
+}
+
+# Detect the operating system
+detect_os() {
+    case "$(uname -s)" in
+        Linux*)     OS="linux";;
+        Darwin*)    OS="macos";;
+        CYGWIN*)    OS="cygwin";;
+        MINGW*)     OS="mingw";;
+        MSYS*)      OS="msys";;
+        *)          OS="unknown";;
+    esac
+
+    # Check if we're on Windows (PowerShell available)
+    if command -v powershell.exe &> /dev/null || command -v pwsh &> /dev/null; then
+        HAS_POWERSHELL=true
+    else
+        HAS_POWERSHELL=false
+    fi
+}
+
+# Run Linux/macOS deployment
+run_bash_deployment() {
+    log "Running Linux/macOS deployment..."
+    chmod +x deploy.sh
+    ./deploy.sh
+}
+
+# Run Windows PowerShell deployment
+run_powershell_deployment() {
+    log "Running Windows PowerShell deployment..."
+
+    # Try different PowerShell executables
+    if command -v pwsh &> /dev/null; then
+        log "Using pwsh (PowerShell Core)..."
+        pwsh -ExecutionPolicy Bypass -File "./deploy.ps1"
+    elif command -v powershell.exe &> /dev/null; then
+        log "Using powershell.exe..."
+        powershell.exe -ExecutionPolicy Bypass -File "./deploy.ps1"
+    else
+        error "PowerShell not found. Please install PowerShell Core or Windows PowerShell."
+        exit 1
+    fi
+}
+
+# Main execution
+main() {
+    log "Cross-platform Portfolio Deployment Script"
+    echo "========================================"
+
+    detect_os
+
+    info "Detected OS: $OS"
+    info "PowerShell available: $HAS_POWERSHELL"
+
+    # Determine which deployment to run
+    case "$OS" in
+        "linux"|"macos")
+            run_bash_deployment
+            ;;
+        "cygwin"|"mingw"|"msys")
+            if [[ "$HAS_POWERSHELL" == "true" ]]; then
+                info "Windows environment detected with PowerShell available"
+                run_powershell_deployment
+            else
+                info "Windows environment detected, but PowerShell not found"
+                info "Falling back to bash deployment (limited functionality)"
+                run_bash_deployment
+            fi
+            ;;
+        *)
+            if [[ "$HAS_POWERSHELL" == "true" ]]; then
+                info "Unknown OS, but PowerShell available - trying PowerShell deployment"
+                run_powershell_deployment
+            else
+                error "Unknown OS and PowerShell not available. Cannot determine deployment method."
+                exit 1
+            fi
+            ;;
+    esac
+}
+
+# Allow passing arguments to the underlying scripts
+if [[ $# -gt 0 ]]; then
+    info "Passing arguments to deployment script: $@"
+    export DEPLOY_ARGS="$@"
+fi
+
+main "$@"

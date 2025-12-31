@@ -1,31 +1,168 @@
-# Digital Portfolio - Production Ready Bootstrap 5
+# Ifreelance4u Portfolio - Secure Bootstrap 5 Website
 
-# Portfolio Website - Production Ready
+A production-ready, secure Bootstrap 5 multi-page portfolio website for Ifreelance4u - Web Security Architect & Developer.
 
-A secure, modern Bootstrap 5 multi-page portfolio for Ifreelance4u - Web Security Architect & Developer
+## ✨ Features
+
+- **5 Responsive Pages**: Home, About, Services, Portfolio, and Contact
+- **Security First**: CSP headers, XSS protection, CSRF tokens, input sanitization
+- **Modern Design**: Bootstrap 5.3.2 with custom styling and animations
+- **Dynamic Content**: JSON-based content management
+- **Component-Based**: Reusable header and footer components
+- **Accessibility**: WCAG compliant with keyboard navigation and screen reader support
+- **Performance**: Optimized assets, lazy loading, and efficient code
 
 ---
 
-## 📋 Portfolio Structure
+## 📁 Project Structure
 
-**Pages Included:**
+```
+/portfolio
+├── index.html              # Home page
+├── about.html             # About page
+├── services.html          # Services page
+├── portfolio.html         # Portfolio/projects page
+├── contact.html           # Contact page with secure form
+├── data/
+│   └── content.json       # Centralized content data
+├── includes/
+│   ├── header.html        # Navigation component
+│   └── footer.html        # Footer component
+├── assets/
+│   ├── css/
+│   │   └── style.css      # Custom styles
+│   ├── js/
+│   │   ├── main.js                 # Core functionality
+│   │   ├── components.js           # Component loader
+│   │   ├── home-content.js         # Home page loader
+│   │   ├── about-content.js        # About page loader
+│   │   ├── services-content.js     # Services page loader
+│   │   ├── portfolio-filter.js     # Portfolio filtering
+│   │   └── contact-form.js         # Secure form handler
+│   └── images/            # Image assets
+├── package.json           # Node.js dependencies (for backend)
+├── .gitignore            # Git ignore rules
+└── README.md             # This file
+```
 
-1. Home (index.html)
-2. About (about.html)
-3. Services (services.html)
-4. Portfolio/Projects (portfolio.html)
-5. Contact (contact.html)
+---
 
-**Security Features Implemented:**
+## 🚀 Quick Start
 
-- Content Security Policy (CSP) headers
-- XSS protection
-- CSRF token implementation
-- Secure form handling with sanitization
-- HTTPS enforcement
-- Subresource Integrity (SRI) for CDN resources
-- Rate limiting for forms
-- Input validation and sanitization
+### Frontend Only (Static Site)
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/wjak-official/portfolio.git
+   cd portfolio
+   ```
+
+2. **Serve with any web server**
+   ```bash
+   # Using Python
+   python -m http.server 8000
+   
+   # Using Node.js http-server
+   npx http-server -p 8000
+   
+   # Using PHP
+   php -S localhost:8000
+   ```
+
+3. **Open in browser**
+   ```
+   http://localhost:8000
+   ```
+
+### With Backend (Node.js/Express)
+
+See [Backend Setup Guide](#-backend-setup-guide) below for full implementation.
+
+---
+
+## 🔐 Security Features
+
+### Implemented Security Measures
+
+1. **Content Security Policy (CSP)**
+   - Restricts resource loading to trusted sources
+   - Prevents XSS attacks
+   - Meta tag implementation in all HTML pages
+
+2. **Input Validation & Sanitization**
+   - All user inputs are sanitized before processing
+   - Email validation with regex
+   - Length constraints on form fields
+   - HTML entity encoding to prevent XSS
+
+3. **CSRF Protection**
+   - Token generation and validation
+   - Session-based token storage
+   - Token verification on form submission
+
+4. **Rate Limiting**
+   - Client-side rate limiting for forms (3 submissions per hour)
+   - Prevents abuse and spam
+   - Configurable time windows and limits
+
+5. **Honeypot Field**
+   - Hidden field to catch bots
+   - Invisible to human users
+   - Automatic rejection of bot submissions
+
+6. **Secure Headers**
+   - X-Content-Type-Options: nosniff
+   - X-Frame-Options: DENY
+   - Referrer-Policy: strict-origin-when-cross-origin
+
+7. **Subresource Integrity (SRI)**
+   - Integrity hashes for Bootstrap CSS/JS
+   - Integrity hashes for Bootstrap Icons
+   - Ensures CDN resources haven't been tampered with
+
+8. **HTTPS Enforcement**
+   - Recommended for production deployment
+   - Protects data in transit
+   - Required for modern security features
+
+---
+
+## 📋 Pages Overview
+
+### 1. Home (index.html)
+- Hero section with call-to-action buttons
+- Core expertise cards (4 areas)
+- Statistics section (4 key metrics)
+- CTA section for engagement
+- Dynamic content loading from JSON
+
+### 2. About (about.html)
+- Personal introduction and journey
+- Expertise areas with skill badges
+- SAL Framework (Security, Accessibility, Longevity)
+- Professional background
+- CTA for services
+
+### 3. Services (services.html)
+- 6 detailed service offerings
+- Feature lists for each service
+- Pricing and timeline information
+- Get Started CTA buttons
+- Responsive service cards
+
+### 4. Portfolio (portfolio.html)
+- Filterable project grid (6 projects)
+- Category filters (All, Healthcare, E-commerce, Finance, etc.)
+- Project details with technologies
+- Hover effects with project information
+- Lazy-loaded images
+
+### 5. Contact (contact.html)
+- Secure contact form with validation
+- Contact information cards
+- Real-time validation
+- Success/error messaging
+- CSRF and honeypot protection
 
 ---
 
@@ -3893,4 +4030,674 @@ console.log(`Server running on port ${PORT}`);
 ---
 ## 🔒 21. Security Implementation Guide
 
-[Welcome to Notion!](https://www.notion.so/Welcome-to-Notion-2cce56e1a6a880728488fe7433643669?pvs=21)
+---
+
+## 🐳 Docker Deployment
+
+### Hybrid Deployment: GitHub Pages + Docker API
+
+For the best of both worlds, you can deploy a **hybrid setup** where:
+- **Static content** stays on **GitHub Pages** (`uat.ifreelance4u.com`)
+- **API backend** runs locally in **Docker** (`api.ifreelance4u.com`)
+
+This gives you fast static delivery + full server-side functionality!
+
+📖 **[Complete Hybrid Setup Guide](HYBRID_DEPLOYMENT.md)**
+
+### Production Deployment with Let's Encrypt SSL
+
+1. **Clone and configure:**
+   ```bash
+   git clone https://github.com/yourusername/portfolio.git
+   cd portfolio
+   cp .env.example .env
+   ```
+
+2. **Update environment variables:**
+   ```bash
+   # Edit .env with your actual values
+   nano .env
+   ```
+
+3. **Update domain configuration:**
+   ```bash
+   # The domain is already configured for: uat.ifreelance4u.com
+   # Update these files if you need a different domain:
+   # - docker-compose.yml (certbot command)
+   # - nginx.conf (server_name directives)
+   # - ssl-renew.sh (DOMAIN and EMAIL variables)
+   # - .env (DOMAIN, WWW_DOMAIN, SSL_EMAIL)
+   ```
+
+4. **Deploy using the automated script:**
+   ```bash
+# Make the script executable and run deployment
+chmod +x deploy.sh
+./deploy.sh
+
+# Cross-platform alternative:
+./deploy   # The script will automatically:
+   # - Generate cryptographically secure secrets for SESSION_SECRET and CSRF_SECRET
+   # - Create the .env file with production-ready configuration
+   # - Create backups of existing .env files (if any)
+   # - Setup SSL certificates for development
+   # - Start all Docker services
+   ```
+
+5. **Configure email settings:**
+   ```bash
+   # Edit the generated .env file to add your email credentials
+   nano .env
+   
+   # Update these required fields:
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-specific-password
+   ```
+
+6. **Setup production SSL certificates:**
+   ```bash
+   # Point your domain DNS to this server, then:
+   sudo ./deploy.sh ssl-issue
+   sudo ./deploy.sh setup-renewal
+   ```
+
+### Development Deployment
+
+1. **Generate self-signed certificates:**
+   ```bash
+   # Generate development SSL certificates
+   openssl req -x509 -newkey rsa:4096 -keyout ssl/key.pem -out ssl/cert.pem -days 365 -nodes -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
+   ```
+
+2. **Start development environment:**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the application:**
+   - HTTP: http://localhost
+   - HTTPS: https://localhost (will show certificate warning)
+
+### Docker Security Features
+
+- **Non-root containers** with dedicated user
+- **Read-only filesystems** with tmpfs for temporary data
+- **Security options** preventing privilege escalation
+- **Resource limits** to prevent abuse
+- **Health checks** for automatic recovery
+- **Nginx reverse proxy** with security hardening
+- **Rate limiting** and DDoS protection
+- **Let's Encrypt** automatic SSL certificate management
+
+### Testing Secret Generation
+
+Before deployment, you can test the secret generation:
+
+```bash
+# Linux/macOS:
+chmod +x test-secrets.sh
+./test-secrets.sh
+
+# Windows (PowerShell):
+.\test-secrets.ps1
+```
+
+This will verify that cryptographically secure secrets can be generated on your system.
+
+### PowerShell Scripts for Windows
+
+For Windows users, PowerShell equivalents are available:
+
+- `deploy.ps1` - Main deployment script
+- `ssl-renew.ps1` - SSL certificate management
+- `test-secrets.ps1` - Secret generation testing
+
+**Usage:**
+```powershell
+# Full deployment
+.\deploy.ps1
+
+# SSL certificate management
+.\ssl-renew.ps1 -Command issue
+.\ssl-renew.ps1 -Command check
+
+# Test secret generation
+.\test-secrets.ps1
+```
+
+All PowerShell scripts include proper administrator privilege checking and Windows-specific implementations.
+
+```bash
+# Use the deployment script for common operations
+./deploy.sh status          # Check deployment status
+./deploy.sh logs           # Show service logs
+./deploy.sh restart        # Restart services
+
+# Or use docker-compose directly
+docker-compose logs -f
+
+# Check container health
+docker-compose ps
+
+# Restart services
+docker-compose restart
+
+# Rebuild after code changes
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+---
+
+## 🛠️ Backend Setup Guide
+
+### Prerequisites
+
+- Node.js 18+ and npm 9+
+- A mail service (Gmail, SendGrid, etc.)
+- SSL certificate for production
+
+### Installation
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Create Environment File**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Configure Environment Variables**
+   Edit `.env` with your settings:
+   ```env
+   # Server Configuration
+   PORT=3000
+   NODE_ENV=production
+   
+   # Email Configuration
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=465
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-specific-password
+   SMTP_FROM="Ifreelance4u <contact@ifreelance4u.com>"
+   
+   # Security
+   SESSION_SECRET=generate-a-strong-random-secret-here
+   CSRF_SECRET=generate-another-strong-secret-here
+   
+   # Rate Limiting
+   RATE_LIMIT_WINDOW=900000
+   RATE_LIMIT_MAX=100
+   ```
+
+### Example Backend Implementation (server.js)
+
+```javascript
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
+const { body, validationResult } = require('express-validator');
+const nodemailer = require('nodemailer');
+const path = require('path');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Security middleware
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
+            styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+            connectSrc: ["'self'"]
+        }
+    },
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
+}));
+
+// CORS configuration
+app.use(cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    credentials: true
+}));
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
+
+// CSRF protection
+const csrfProtection = csrf({ cookie: true });
+
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW) || 900000,
+    max: parseInt(process.env.RATE_LIMIT_MAX) || 100,
+    message: 'Too many requests from this IP, please try again later.'
+});
+
+const contactLimiter = rateLimit({
+    windowMs: 3600000, // 1 hour
+    max: 3,
+    message: 'Too many contact form submissions, please try again later.'
+});
+
+app.use('/api/', limiter);
+
+// Serve static files
+app.use(express.static(path.join(__dirname)));
+
+// Email transporter
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    secure: true,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
+});
+
+// API Routes
+
+// Get CSRF token
+app.get('/api/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
+
+// Contact form submission
+app.post('/api/contact',
+    contactLimiter,
+    csrfProtection,
+    [
+        body('name').trim().isLength({ min: 2, max: 100 }).escape(),
+        body('email').isEmail().normalizeEmail(),
+        body('subject').trim().isLength({ min: 1, max: 200 }).escape(),
+        body('message').trim().isLength({ min: 10, max: 1000 }).escape()
+    ],
+    async (req, res) => {
+        // Validate input
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { name, email, subject, message } = req.body;
+
+        // Email options
+        const mailOptions = {
+            from: process.env.SMTP_FROM,
+            to: process.env.SMTP_USER,
+            subject: `Portfolio Contact: ${subject}`,
+            html: `
+                <h2>New Contact Form Submission</h2>
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Subject:</strong> ${subject}</p>
+                <p><strong>Message:</strong></p>
+                <p>${message}</p>
+            `,
+            replyTo: email
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.json({ success: true, message: 'Message sent successfully!' });
+        } catch (error) {
+            console.error('Email error:', error);
+            res.status(500).json({ success: false, message: 'Failed to send message.' });
+        }
+    }
+);
+
+// Error handling
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).json({ error: 'Invalid CSRF token' });
+    }
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+});
+```
+
+### Running the Backend
+
+```bash
+# Development
+npm run dev
+
+# Production
+npm start
+```
+
+---
+
+## 🎨 Customization Guide
+
+### Updating Content
+
+All content is centralized in `data/content.json`. Update this file to change:
+- Site name and description
+- Navigation items
+- Hero section text
+- Expertise areas
+- Statistics
+- About page content
+- Services
+- Portfolio projects
+- Social links
+- Footer content
+
+### Changing Colors
+
+Edit CSS variables in `assets/css/style.css`:
+
+```css
+:root {
+    --primary-color: #0d6efd;      /* Main brand color */
+    --secondary-color: #6c757d;    /* Secondary color */
+    --success-color: #198754;      /* Success messages */
+    --danger-color: #dc3545;       /* Error messages */
+    /* ... more variables ... */
+}
+```
+
+### Adding New Pages
+
+1. Create new HTML file (e.g., `blog.html`)
+2. Include header and footer divs
+3. Add navigation link to `data/content.json`
+4. Create corresponding JS file if needed (e.g., `assets/js/blog-content.js`)
+5. Update sitemap
+
+### Replacing Images
+
+1. Add images to `assets/images/`
+2. Update references in `data/content.json`
+3. Optimize images before uploading
+4. Use descriptive filenames and alt text
+
+---
+
+## 📱 Responsive Design
+
+The site is fully responsive with breakpoints:
+- **Mobile**: < 576px
+- **Tablet**: 576px - 768px
+- **Desktop**: 768px - 992px
+- **Large Desktop**: > 992px
+
+Test responsiveness:
+- Chrome DevTools (F12 → Toggle Device Toolbar)
+- Firefox Responsive Design Mode
+- Real devices when possible
+
+---
+
+## ♿ Accessibility
+
+### Features Implemented
+
+- Semantic HTML5 elements
+- ARIA labels and roles
+- Keyboard navigation support
+- Skip to main content link
+- Focus visible indicators
+- Alt text for images
+- Color contrast compliance
+- Screen reader friendly
+
+### Testing Accessibility
+
+```bash
+# Using axe-core
+npx @axe-core/cli http://localhost:8000
+
+# Using Lighthouse
+lighthouse http://localhost:8000 --view
+```
+
+---
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] All pages load without errors
+- [ ] Navigation works correctly
+- [ ] Forms validate properly
+- [ ] CSRF tokens are generated
+- [ ] Rate limiting works
+- [ ] Honeypot catches bots
+- [ ] Responsive design on mobile/tablet/desktop
+- [ ] Cross-browser compatibility (Chrome, Firefox, Safari, Edge)
+- [ ] Accessibility with keyboard navigation
+- [ ] Images load correctly
+- [ ] Links work (internal and external)
+- [ ] Console shows no errors
+
+### Browser Testing
+
+Test on:
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+### Security Testing
+
+```bash
+# Check security headers
+curl -I https://your-domain.com
+
+# Using securityheaders.com
+# Visit: https://securityheaders.com/?q=your-domain.com
+
+# Using Mozilla Observatory
+# Visit: https://observatory.mozilla.org/
+```
+
+---
+
+## 🚀 Deployment
+
+### Static Site Deployment
+
+#### GitHub Pages
+1. Push code to GitHub
+2. Go to Settings → Pages
+3. Select branch and folder
+4. Save and wait for deployment
+
+#### Netlify
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Deploy
+netlify deploy --prod
+```
+
+#### Vercel
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel --prod
+```
+
+### Node.js Backend Deployment
+
+#### Heroku
+```bash
+# Login to Heroku
+heroku login
+
+# Create app
+heroku create your-app-name
+
+# Set environment variables
+heroku config:set NODE_ENV=production
+heroku config:set SMTP_HOST=smtp.gmail.com
+# ... set other env vars
+
+# Deploy
+git push heroku main
+```
+
+#### DigitalOcean / VPS
+```bash
+# SSH into server
+ssh user@your-server-ip
+
+# Clone repository
+git clone https://github.com/wjak-official/portfolio.git
+cd portfolio
+
+# Install dependencies
+npm install --production
+
+# Set up PM2
+npm install -g pm2
+pm2 start server.js --name portfolio
+pm2 startup
+pm2 save
+
+# Configure Nginx as reverse proxy
+sudo nano /etc/nginx/sites-available/portfolio
+# Add configuration, then enable and restart Nginx
+```
+
+### SSL/TLS Certificate
+
+```bash
+# Using Let's Encrypt with Certbot
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+```
+
+---
+
+## 📊 Performance Optimization
+
+### Best Practices
+
+1. **Minify Assets**
+   ```bash
+   # CSS
+   npx clean-css-cli -o assets/css/style.min.css assets/css/style.css
+   
+   # JavaScript
+   npx terser assets/js/*.js -o assets/js/bundle.min.js
+   ```
+
+2. **Image Optimization**
+   - Use WebP format with fallbacks
+   - Compress images (TinyPNG, ImageOptim)
+   - Use appropriate dimensions
+   - Implement lazy loading
+
+3. **Caching**
+   - Set proper cache headers
+   - Use CDN for static assets
+   - Enable browser caching
+
+4. **Monitoring**
+   - Google Analytics
+   - Google Search Console
+   - Uptime monitoring (UptimeRobot)
+   - Error tracking (Sentry)
+
+---
+
+## 🔒 Security Checklist
+
+### Pre-Deployment
+
+- [x] CSP headers implemented
+- [x] CSRF protection enabled
+- [x] XSS prevention with input sanitization
+- [x] Rate limiting configured
+- [x] Honeypot field added
+- [x] SRI hashes for CDN resources
+- [ ] HTTPS enabled
+- [ ] Security headers verified
+- [ ] Environment variables secured
+- [ ] No secrets in code
+
+### Production
+
+- [ ] Regular security updates
+- [ ] Monitor for vulnerabilities
+- [ ] Regular backups
+- [ ] Incident response plan
+- [ ] Security audit conducted
+- [ ] Penetration testing performed
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👤 Author
+
+**Ifreelance4u**
+- Website: [ifreelance4u.com](https://ifreelance4u.com)
+- GitHub: [@ifreelance4u](https://github.com/ifreelance4u)
+- LinkedIn: [ifreelance4u](https://linkedin.com/in/ifreelance4u)
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 🙏 Acknowledgments
+
+- [Bootstrap 5](https://getbootstrap.com/) - Frontend framework
+- [Bootstrap Icons](https://icons.getbootstrap.com/) - Icon library
+- [OWASP](https://owasp.org/) - Security guidelines
+- [MDN Web Docs](https://developer.mozilla.org/) - Web development resources
+
+---
+
+## 📞 Support
+
+For support or inquiries:
+- Email: contact@ifreelance4u.com
+- GitHub Issues: [Create an issue](https://github.com/wjak-official/portfolio/issues)
+
+---
+
+**Built with ❤️ and 🔒 by Ifreelance4u**
