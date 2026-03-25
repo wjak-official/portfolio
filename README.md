@@ -293,7 +293,7 @@ A: Open `assets/css/style.css` and edit the CSS custom properties at the top of 
 A: No. In pure static mode (without the Node.js backend running), there is no `/api/csrf-token` endpoint to call. The browser logs a console warning when the CSRF token cannot be fetched, and the form submission will fail with a generic error message. Either run `npm start` / `docker compose up` to enable the full stack, or replace the form with a static-compatible form service.
 
 **Q: How do I enable HTTPS locally?**  
-A: Run `bash generate-ssl.sh`. This creates `ssl/cert.pem` and `ssl/key.pem` (self-signed). Then set `FORCE_HTTPS=true` in `.env` and restart the server. Your browser will warn about the self-signed cert — this is expected in development.
+A: Run `bash generate-ssl.sh`. This creates `ssl/cert.pem` and `ssl/key.pem` (self-signed) for the local Nginx reverse proxy used in the Docker setup. Then start the stack with Docker (for example, `docker compose up`) and access the site at `https://localhost`. Your browser will warn about the self-signed certificate — this is expected in development. Setting `FORCE_HTTPS=true` alone does **not** make the standalone Node.js server serve HTTPS; HTTPS termination is handled by Nginx.
 
 **Q: What Node.js version is required?**  
 A: Node.js ≥ 18.0.0 and npm ≥ 9.0.0.
