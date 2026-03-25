@@ -284,7 +284,7 @@ A: Yes. All five pages work as pure static HTML. The only feature that requires 
 A: Edit `data/content.json`. All page text, navigation links, social URLs, and metadata are loaded from this file at runtime — no need to touch individual HTML files for copy changes.
 
 **Q: How do I add or remove portfolio projects?**  
-A: Add or remove entries in the `projects` array inside `data/content.json`. Each project supports `title`, `description`, `tags`, `image`, and `link` fields. The filter buttons on the portfolio page are generated automatically from the tags present.
+A: Add or remove entries in the `portfolio` array inside `data/content.json`. Each project supports `title`, `description`, `category`, `image`, and `link` fields. The filter buttons on the portfolio page are generated automatically from each project's `category` value.
 
 **Q: How do I change the color scheme?**  
 A: Open `assets/css/style.css` and edit the CSS custom properties at the top of the file (`:root { ... }`). The primary brand color, accent, and background are all defined there.
