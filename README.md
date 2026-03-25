@@ -289,8 +289,8 @@ A: Add or remove entries in the `portfolio` array inside `data/content.json`. Ea
 **Q: How do I change the color scheme?**  
 A: Open `assets/css/style.css` and edit the CSS custom properties at the top of the file (`:root { ... }`). The primary brand color, accent, and background are all defined there.
 
-**Q: The contact form says "Failed to load CSRF token" in static mode — is that a bug?**  
-A: No. Without the Node.js backend running, there is no `/api/csrf-token` endpoint to call. Either run `npm start` / `docker compose up` to enable the full stack, or replace the form with a static-compatible form service.
+**Q: The contact form fails in static mode — is that a bug?**  
+A: No. In pure static mode (without the Node.js backend running), there is no `/api/csrf-token` endpoint to call. The browser logs a console warning when the CSRF token cannot be fetched, and the form submission will fail with a generic error message. Either run `npm start` / `docker compose up` to enable the full stack, or replace the form with a static-compatible form service.
 
 **Q: How do I enable HTTPS locally?**  
 A: Run `bash generate-ssl.sh`. This creates `ssl/cert.pem` and `ssl/key.pem` (self-signed). Then set `FORCE_HTTPS=true` in `.env` and restart the server. Your browser will warn about the self-signed cert — this is expected in development.
