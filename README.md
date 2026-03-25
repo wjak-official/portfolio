@@ -109,7 +109,7 @@ portfolio/
 - [Node.js](https://nodejs.org/) ≥ 18.0.0 (only needed for the backend)
 - A modern browser
 
-### Option A — Static Only (no server needed)
+### Option A — Static frontend only (no Node.js backend)
 
 ```bash
 # Clone the repo
