@@ -236,9 +236,7 @@ app.post('/api/contact',
                                 <p><strong>Email:</strong> ${escapeHtml(email)}</p>
                                 <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
                                 <p><strong>Message:</strong></p>
-                                <div style="background: white; padding: 15px; border-radius: 3px; border-left: 4px solid #007bff; white-space: pre-wrap;">
-                                    ${escapeHtml(message)}
-                                </div>
+                                <div style="background: white; padding: 15px; border-radius: 3px; border-left: 4px solid #007bff; white-space: pre-wrap;">${escapeHtml(message)}</div>
                             </div>
                             <p style="color: #666; font-size: 12px; margin-top: 20px;">
                                 This message was sent from the portfolio contact form.
