@@ -152,7 +152,9 @@ app.post('/api/contact',
             .isLength({ min: 2, max: 100 })
             .withMessage('Name must be between 2 and 100 characters')
             .matches(/^[a-zA-Z\s\-'\.]+$/)
-            .withMessage('Name contains invalid characters'),
+            .withMessage('Name contains invalid characters')
+            .not().matches(/[\r\n]/)
+            .withMessage('Name cannot contain line breaks'),
         body('email')
             .isEmail()
             .withMessage('Please provide a valid email address')
@@ -175,7 +177,9 @@ app.post('/api/contact',
         body('subject')
             .trim()
             .isLength({ min: 1, max: 200 })
-            .withMessage('Subject must be between 1 and 200 characters'),
+            .withMessage('Subject must be between 1 and 200 characters')
+            .not().matches(/[\r\n]/)
+            .withMessage('Subject contains invalid characters'),
         body('message')
             .trim()
             .isLength({ min: 10, max: 1000 })
