@@ -33,6 +33,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+// HTML escaping helper to prevent XSS when embedding user data in HTML templates
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // Create logs directory if it doesn't exist
 const logsDir = path.join(__dirname, 'logs');
 if (!fs.existsSync(logsDir)) {
@@ -141,8 +152,7 @@ app.post('/api/contact',
             .isLength({ min: 2, max: 100 })
             .withMessage('Name must be between 2 and 100 characters')
             .matches(/^[a-zA-Z\s\-'\.]+$/)
-            .withMessage('Name contains invalid characters')
-            .escape(),
+            .withMessage('Name contains invalid characters'),
         body('email')
             .isEmail()
             .withMessage('Please provide a valid email address')
@@ -165,13 +175,11 @@ app.post('/api/contact',
         body('subject')
             .trim()
             .isLength({ min: 1, max: 200 })
-            .withMessage('Subject must be between 1 and 200 characters')
-            .escape(),
+            .withMessage('Subject must be between 1 and 200 characters'),
         body('message')
             .trim()
             .isLength({ min: 10, max: 1000 })
             .withMessage('Message must be between 10 and 1000 characters')
-            .escape()
     ],
     async (req, res) => {
         try {
@@ -224,12 +232,12 @@ app.post('/api/contact',
                         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                             <h2 style="color: #333;">New Contact Form Submission</h2>
                             <div style="background: #f5f5f5; padding: 20px; border-radius: 5px;">
-                                <p><strong>Name:</strong> ${name}</p>
-                                <p><strong>Email:</strong> ${email}</p>
-                                <p><strong>Subject:</strong> ${subject}</p>
+                                <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+                                <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+                                <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
                                 <p><strong>Message:</strong></p>
-                                <div style="background: white; padding: 15px; border-radius: 3px; border-left: 4px solid #007bff;">
-                                    ${message.replace(/\n/g, '<br>')}
+                                <div style="background: white; padding: 15px; border-radius: 3px; border-left: 4px solid #007bff; white-space: pre-wrap;">
+                                    ${escapeHtml(message)}
                                 </div>
                             </div>
                             <p style="color: #666; font-size: 12px; margin-top: 20px;">
