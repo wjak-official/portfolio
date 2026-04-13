@@ -188,15 +188,12 @@ app.post('/api/contact',
             .isLength({ min: 10, max: 1000 })
             .withMessage('Message must be between 10 and 1000 characters'),
         body('challenge_a')
-            .optional()
             .isInt({ min: 1, max: 10 })
             .withMessage('Invalid challenge field'),
         body('challenge_b')
-            .optional()
             .isInt({ min: 1, max: 10 })
             .withMessage('Invalid challenge field'),
         body('challenge_answer')
-            .optional()
             .isInt({ min: 2, max: 20 })
             .withMessage('Invalid challenge answer')
     ],
@@ -213,15 +210,13 @@ app.post('/api/contact',
 
             const { name, email, subject, message, challenge_a, challenge_b, challenge_answer } = req.body;
 
-            // Validate bot challenge when the client sends the challenge fields
-            if (challenge_a !== undefined && challenge_b !== undefined && challenge_answer !== undefined) {
-                const expectedAnswer = parseInt(challenge_a, 10) + parseInt(challenge_b, 10);
-                if (parseInt(challenge_answer, 10) !== expectedAnswer) {
-                    return res.status(400).json({
-                        success: false,
-                        message: 'Bot challenge verification failed'
-                    });
-                }
+            // Validate bot challenge (required fields — bypass is rejected by validation above)
+            const expectedAnswer = parseInt(challenge_a, 10) + parseInt(challenge_b, 10);
+            if (parseInt(challenge_answer, 10) !== expectedAnswer) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Bot challenge verification failed'
+                });
             }
 
             // Additional server-side validation
