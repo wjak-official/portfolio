@@ -263,15 +263,92 @@ This project applies defence-in-depth at multiple layers:
 | Layer | Measures |
 |-------|----------|
 | **HTTP Headers** | [Helmet.js](https://helmetjs.github.io/) — CSP, HSTS, X-Frame-Options, etc. |
-| **CSRF** | Double-submit cookie pattern via `csrf-csrf` |
+| **CSRF** | Double-submit cookie pattern via `csrf-csrf`; token bootstrapped on page load |
 | **Rate Limiting** | `express-rate-limit` — global (100/15 min) and contact-specific (3/hour) |
 | **Input Validation** | `express-validator` — type checks, length limits, email regex |
 | **XSS** | DOMPurify on the client; HTML entity encoding on the server |
 | **Compression** | `compression` middleware (gzip level 6) |
 | **CORS** | Explicit allowlist via `ALLOWED_ORIGINS` env var |
 | **Honeypot** | Hidden form field to trap bots |
+| **Bot Challenge** | Client-side math challenge with server-side arithmetic verification |
 
 > Found a security issue? Please open a **private** GitHub issue or email directly rather than disclosing publicly.
+
+---
+
+## 🛡️ GitHub Pages Security Baseline Checklist
+
+### What works on pure GitHub Pages
+
+| Control | Pages-native | Requires edge/proxy |
+|---------|:---:|:---:|
+| CSP via `<meta http-equiv>` (partial) | ✅ | — |
+| `base-uri` / `form-action` in CSP meta | ✅ | — |
+| `upgrade-insecure-requests` in CSP meta | ✅ | — |
+| SRI on CDN scripts/styles | ✅ | — |
+| Client-side honeypot | ❌ | — |
+| Client-side math bot challenge | ❌ | — |
+| Client-side rate limiting (localStorage) | ❌ | — |
+| CSRF token fetch + double-submit cookie | ❌ | — |
+| **Real HTTP `Content-Security-Policy` header** | ❌ | ✅ |
+| **`X-Frame-Options: DENY`** | ❌ | ✅ |
+| **`frame-ancestors 'none'` (CSP)** | ❌ | ✅ |
+| **`Strict-Transport-Security`** | ❌ | ✅ |
+| **`X-Content-Type-Options`** | ❌ | ✅ |
+| **`Referrer-Policy`** (real header) | ❌ | ✅ |
+| **`Permissions-Policy`** | ❌ | ✅ |
+
+> **Key limitation:** GitHub Pages does not allow custom HTTP response headers.  
+> The `_headers` file in this repo is applied only when served through a CDN/proxy layer  
+> that honours the Netlify/Cloudflare Pages `_headers` convention (e.g. Cloudflare Pages,  
+> Netlify). For pure GitHub Pages, the `<meta>` CSP tags in each HTML page provide a  
+> partial, client-side mitigation.
+
+### DNS / HTTPS / CORS / CSRF requirements (hybrid static + API)
+
+1. **HTTPS everywhere** — both the static Pages domain and `api.example.com` must be  
+   served over TLS.  Set `FORCE_HTTPS=true` in `.env` and terminate TLS at Nginx / Cloudflare.
+   `api.example.com` is a reserved example hostname for documentation; replace it with your real API host in production.
+2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://yourusername.github.io/your-repo`  
+   in `.env`.  Never use `*` on the API.
+3. **CSRF cookies** — the static frontend (`yourusername.github.io/your-repo`) and the API  
+   (`api.example.com`) are on different eTLD+1, making every request **cross-site**.  
+   `SameSite=Strict` cookies are blocked by browsers in cross-site contexts, so the CSRF  
+   cookie must be `SameSite=None; Secure` (set in `server.js`).  Frontend fetches must use  
+   `credentials: 'include'` and the API must set `Access-Control-Allow-Credentials: true`.  
+   > **Note:** `SameSite=None` requires the cookie to be sent over HTTPS (`Secure` flag).  
+   > Never use `SameSite=None` on a plain HTTP deployment.
+4. **HSTS** — configure `HSTS_MAX_AGE=31536000` and `HSTS_INCLUDE_SUBDOMAINS=true` once  
+   HTTPS is stable.  Only add to the HSTS preload list after extensive testing.
+
+### Verification commands
+
+```bash
+# Check real HTTP security headers (replace with your domain)
+curl -sI https://yourusername.github.io/your-repo | grep -iE 'content-security|x-frame|x-content-type|strict-transport|referrer|permissions'
+
+# Verify HSTS
+curl -sI https://yourusername.github.io/your-repo | grep -i strict-transport
+
+# Verify CSRF flow: fetch token (cookie must be set in response)
+curl -c /tmp/cookies.txt -s https://api.example.com/api/csrf-token
+# Expected: {"csrfToken":"<token>"}  +  Set-Cookie: csrf-token=...
+
+# Submit contact form with valid CSRF (requires jq; install with: apt install jq / brew install jq)
+TOKEN=$(curl -c /tmp/cookies.txt -s https://api.example.com/api/csrf-token | jq -r '.csrfToken')
+curl -b /tmp/cookies.txt -s -X POST https://api.example.com/api/contact \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $TOKEN" \
+  -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Hello world test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
+
+# Verify frame protection (should see DENY or frame-ancestors 'none')
+curl -sI https://yourusername.github.io/your-repo | grep -i x-frame
+
+# Test CORS preflight
+curl -s -X OPTIONS https://api.example.com/api/csrf-token \
+  -H "Origin: https://yourusername.github.io/your-repo" \
+  -H "Access-Control-Request-Method: GET" -v 2>&1 | grep -i access-control
+```
 
 ---
 

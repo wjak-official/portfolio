@@ -1,8 +1,10 @@
 # Hybrid Deployment Guide: GitHub Pages + Docker API
 
 This guide explains how to set up a hybrid deployment where:
-- **Static content** (HTML, CSS, JS) is served from **GitHub Pages** on `uat.ifreelance4u.com`
-- **API backend** (Node.js) runs locally in **Docker** on `api.ifreelance4u.com` subdomain
+- **Static content** (HTML, CSS, JS) is served from **GitHub Pages** on `yourusername.github.io/your-repo`
+- **API backend** (Node.js) runs locally in **Docker** on the demo placeholder subdomain `api.example.com`
+
+> `api.example.com` is a reserved example hostname used for documentation and demo purposes. Replace it with your real API hostname before deploying a live system.
 
 ## 🏗️ Architecture Overview
 
@@ -10,8 +12,8 @@ This guide explains how to set up a hybrid deployment where:
 ┌─────────────────┐    ┌─────────────────┐
 │   GitHub Pages  │    │   Docker API    │
 │                 │    │                 │
-│ uat.ifreelance │────│ api.ifreelance  │
-│ 4u.com         │    │ 4u.com          │
+│ yourusername    │────│ api.example.com │
+│ .github.io/your-repo │    │                 │
 │                 │    │                 │
 │ - Static HTML   │    │ - CSRF tokens   │
 │ - CSS/JS        │    │ - Contact form  │
@@ -55,7 +57,7 @@ This guide explains how to set up a hybrid deployment where:
 4. **Verify DNS Propagation**
    ```bash
    # Test DNS resolution
-   nslookup api.ifreelance4u.com
+   nslookup api.example.com
 
    # Should return your local IP address
    ```
@@ -76,7 +78,7 @@ Your router needs to forward external requests on ports 80 and 443 to your local
 #### **Test Port Forwarding:**
 ```bash
 # From external network (not your local network)
-curl -I http://api.ifreelance4u.com
+curl -I http://api.example.com
 
 # Should reach your local Docker container
 ```
@@ -145,16 +147,16 @@ sudo ./ssl-renew.sh issue
 
 ### 2. Update Static Files (Already Done)
 
-The static HTML files have been updated to call the API subdomain:
-- `main.js`: `fetch('https://api.ifreelance4u.com/api/csrf-token')`
-- `contact-form.js`: `fetch('https://api.ifreelance4u.com/api/contact')`
+The static assets now use demo-friendly placeholders:
+- `main.js`: `fetch('https://api.example.com/api/csrf-token')`
+- `contact-form.js`: demo-only preview logic with no live API submission
 
 ### 3. Deploy to GitHub Pages
 
 ```bash
 # Commit and push changes
 git add .
-git commit -m "Update API calls to use api.ifreelance4u.com subdomain"
+git commit -m "Update API calls to use the demo placeholder api.example.com"
 git push origin main
 ```
 
@@ -163,41 +165,41 @@ git push origin main
 ### 1. Test Static Site
 ```bash
 # Should load from GitHub Pages
-curl -I https://uat.ifreelance4u.com
+curl -I https://yourusername.github.io/your-repo
 # Response: HTTP/2 200 (from GitHub)
 ```
 
 ### 2. Test API Backend
 ```bash
 # Should reach your local Docker
-curl -I https://api.ifreelance4u.com/api/health
+curl -I https://api.example.com/api/health
 # Response: HTTP/2 200 (from your local Docker)
 ```
 
 ### 3. Test CORS
 ```bash
 # Test from GitHub Pages domain to API
-curl -X OPTIONS -H "Origin: https://uat.ifreelance4u.com" \
-     https://api.ifreelance4u.com/api/csrf-token
+curl -X OPTIONS -H "Origin: https://yourusername.github.io/your-repo" \
+     https://api.example.com/api/csrf-token
 # Should return CORS headers allowing the origin
 ```
 
 ### 4. Test Contact Form
-1. **Visit:** `https://uat.ifreelance4u.com`
-2. **Fill out contact form**
-3. **Submit** - should call `https://api.ifreelance4u.com/api/contact`
-4. **Check email** - should receive the contact form submission
+1. **Open the contact form** at `https://yourusername.github.io/your-repo/contact.html`
+2. **Fill out the form** with test data and solve the math challenge.Try to input wrong answer to see the validation in action, you can also try to input incorrect formats in other fields and see how the form handles it.
+3. **Submit** - in a live deployment this would call `https://api.example.com/api/contact`
+4. **Check backend behavior** - in a live deployment, confirm the submission is processed as expected
 
 ## 🔧 Troubleshooting
 
 ### DNS Issues
 ```bash
 # Check DNS resolution
-nslookup api.ifreelance4u.com
+nslookup api.example.com
 
 # Check if ports are open externally
-telnet api.ifreelance4u.com 80
-telnet api.ifreelance4u.com 443
+telnet api.example.com 80
+telnet api.example.com 443
 ```
 
 ### Port Forwarding Issues
@@ -213,14 +215,14 @@ curl http://YOUR_LOCAL_IP/api/health
 ### CORS Issues
 ```bash
 # Check CORS headers
-curl -H "Origin: https://uat.ifreelance4u.com" \
-     -v https://api.ifreelance4u.com/api/csrf-token
+curl -H "Origin: https://yourusername.github.io/your-repo" \
+     -v https://api.example.com/api/csrf-token
 ```
 
 ### SSL Issues
 ```bash
 # Check SSL certificate
-openssl s_client -connect api.ifreelance4u.com:443 -servername api.ifreelance4u.com
+openssl s_client -connect api.example.com:443 -servername api.example.com
 
 # Renew certificate if needed
 sudo ./ssl-renew.sh renew
@@ -261,7 +263,7 @@ Make sure you're running the right command in the right shell:
 ### Health Checks
 ```bash
 # Monitor API health
-curl https://api.ifreelance4u.com/api/health
+curl https://api.example.com/api/health
 
 # Check Docker containers
 docker-compose ps
@@ -291,6 +293,77 @@ sudo ./ssl-renew.sh renew
 ✅ **Cost Effective** - GitHub Pages is free, local server for API
 ✅ **Development Friendly** - Easy to modify and test locally
 ✅ **Scalable** - Can move API to cloud later if needed
+
+## 🔐 Security Baseline for the Hybrid Architecture
+
+### GitHub Pages header limitations
+
+GitHub Pages does **not** apply custom HTTP response headers from repository files.
+The `_headers` file in this repository is only honoured when the site is served through
+a CDN/proxy layer that supports the Netlify / Cloudflare Pages `_headers` convention.
+
+For pure GitHub Pages, the `<meta http-equiv="Content-Security-Policy">` tags in each
+HTML page provide a partial, client-side CSP mitigation. The following headers **cannot**
+be set client-side and require an edge/proxy layer:
+
+- `Strict-Transport-Security` (HSTS)
+- `X-Frame-Options`
+- `X-Content-Type-Options`
+- `Referrer-Policy` (as a real header)
+- `Permissions-Policy`| HTTPS on both domains | TLS at Nginx / Cloudflare for `api.*`; GitHub enforces HTTPS for Pages |
+| CORS allowlist | Set `ALLOWED_ORIGINS=https://yourusername.github.io/your-repo` in `.env` |
+| CSRF cookies | The CSRF cookie is set to `SameSite=None; Secure` in `server.js`; frontend fetches use `credentials: 'include'` |
+| API `Access-Control-Allow-Credentials` | Automatically set by the CORS config when origin matches |
+| HSTS | Set `HSTS_MAX_AGE=31536000`, `HSTS_INCLUDE_SUBDOMAINS=true` in `.env` |
+- `frame-ancestors` directive in CSP (only works as a real HTTP header)
+
+### Required setup for the hybrid static + API architecture
+
+| Requirement | Action |
+|-------------|--------|
+
+
+### Security verification commands
+
+```bash
+# 1. Verify CSRF token flow
+#    The response must set a Set-Cookie header alongside the JSON token.
+curl -c /tmp/csrf_cookies.txt -sv https://api.example.com/api/csrf-token 2>&1 \
+  | grep -E 'csrfToken|set-cookie|< HTTP'
+
+# 2. Submit a valid contact request (uses the cookie from step 1; requires jq)
+TOKEN=$(curl -c /tmp/csrf_cookies.txt -s https://api.example.com/api/csrf-token \
+  | jq -r '.csrfToken')
+curl -b /tmp/csrf_cookies.txt -s -X POST https://api.example.com/api/contact \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $TOKEN" \
+  -d '{"name":"Test User","email":"test@example.com","subject":"general","message":"Integration test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
+
+# 3. Verify CORS preflight is accepted for the Pages origin
+curl -sv -X OPTIONS https://api.example.com/api/csrf-token \
+  -H "Origin: https://yourusername.github.io/your-repo" \
+  -H "Access-Control-Request-Method: GET" 2>&1 \
+  | grep -i 'access-control'
+
+# 4. Check HTTP security headers on the API (Helmet-managed)
+curl -sI https://api.example.com/api/health \
+  | grep -iE 'x-frame|x-content-type|strict-transport|content-security|referrer'
+
+# 5. Verify frame protection on the static site
+#    (Only meaningful when served through a layer that applies _headers)
+curl -sI https://yourusername.github.io/your-repo | grep -i 'x-frame\|frame-ancestors'
+
+# 6. Check HSTS on the API
+curl -sI https://api.example.com | grep -i strict-transport
+
+# 7. Confirm CSRF rejection works (submit without a valid token — should get 403)
+curl -s -X POST https://api.example.com/api/contact \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: invalid-token" \
+  -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Should be rejected"}' \
+  | python3 -m json.tool
+# Expected: {"success":false,"message":"Invalid CSRF token..."}
+```
 
 ## 🚀 Next Steps
 

@@ -6,7 +6,7 @@ param(
 )
 
 # Configuration
-$DOMAIN = "api.ifreelance4u.com"
+$DOMAIN = "api.example.com"
 $WWW_DOMAIN = "www.$DOMAIN"
 $EMAIL = "info@ifreelance4u.com"
 
@@ -124,8 +124,8 @@ function New-EnvironmentFile {
     # Create .env file content
     $envContent = @"
 # Domain Configuration (API subdomain for backend)
-DOMAIN=api.ifreelance4u.com
-WWW_DOMAIN=api.ifreelance4u.com
+DOMAIN=api.example.com
+WWW_DOMAIN=api.example.com
 
 # SSL Configuration
 SSL_EMAIL=info@ifreelance4u.com
@@ -145,10 +145,9 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-specific-password
-SMTP_FROM="Ifreelance4u <info@ifreelance4u.com>"
-
+SMTP_FROM="Your Name <your-email@gmail.com>"
 # CORS - Allow requests from GitHub Pages domain
-ALLOWED_ORIGINS=https://uat.ifreelance4u.com,https://www.uat.ifreelance4u.com,https://api.ifreelance4u.com
+ALLOWED_ORIGINS=https://your-org.github.io
 
 # Rate Limiting Configuration
 RATE_LIMIT_WINDOW=900000

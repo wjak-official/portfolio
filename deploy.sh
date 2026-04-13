@@ -23,9 +23,9 @@ BLUE='\033[0;34m'    info "Next steps:"
     info "Generated secrets have been saved to .env"
     info "Keep this file secure and never commit it to version control!" # No Color
 
-DOMAIN="api.ifreelance4u.com"
-WWW_DOMAIN="api.ifreelance4u.com"
-EMAIL="info@ifreelance4u.com"
+DOMAIN="api.example.com"
+WWW_DOMAIN="api.example.com"
+EMAIL="your-email@gmail.com"
 
 log() {
     echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
@@ -86,8 +86,8 @@ setup_environment() {
         # Create .env file with generated secrets and defaults
         cat > .env << EOF
 # Domain Configuration (API subdomain for backend)
-DOMAIN=api.ifreelance4u.com
-WWW_DOMAIN=api.ifreelance4u.com
+DOMAIN=api.example.com
+WWW_DOMAIN=api.example.com
 
 # SSL Configuration
 SSL_EMAIL=info@ifreelance4u.com
@@ -107,11 +107,10 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=465
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-specific-password
-SMTP_FROM="Ifreelance4u <info@ifreelance4u.com>"
+SMTP_FROM="Your Name <your-email@gmail.com>"
 
 # CORS - Allow requests from GitHub Pages domain
-ALLOWED_ORIGINS=https://uat.ifreelance4u.com,https://www.uat.ifreelance4u.com,https://api.ifreelance4u.com
-
+ALLOWED_ORIGINS=https://your-org.github.io
 # Rate Limiting Configuration
 RATE_LIMIT_WINDOW=900000
 RATE_LIMIT_MAX=100
