@@ -37,7 +37,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
 
   # Content Security Policy
-  # Covers all five static pages; contact.html connect-src includes the API.
+  # Shared header-level CSP for the static pages; this policy allows the API in connect-src and form-action.
   Content-Security-Policy: default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://api.ifreelance4u.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.ifreelance4u.com; upgrade-insecure-requests
 
 # Static assets — long cache, immutable where appropriate

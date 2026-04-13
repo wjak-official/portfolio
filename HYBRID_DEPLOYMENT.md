@@ -308,18 +308,18 @@ be set client-side and require an edge/proxy layer:
 - `X-Frame-Options`
 - `X-Content-Type-Options`
 - `Referrer-Policy` (as a real header)
-- `Permissions-Policy`
+- `Permissions-Policy`| HTTPS on both domains | TLS at Nginx / Cloudflare for `api.*`; GitHub enforces HTTPS for Pages |
+| CORS allowlist | Set `ALLOWED_ORIGINS=https://wjak-official.github.io` in `.env` |
+| CSRF cookies | The CSRF cookie is set to `SameSite=None; Secure` in `server.js`; frontend fetches use `credentials: 'include'` |
+| API `Access-Control-Allow-Credentials` | Automatically set by the CORS config when origin matches |
+| HSTS | Set `HSTS_MAX_AGE=31536000`, `HSTS_INCLUDE_SUBDOMAINS=true` in `.env` |
 - `frame-ancestors` directive in CSP (only works as a real HTTP header)
 
 ### Required setup for the hybrid static + API architecture
 
 | Requirement | Action |
 |-------------|--------|
-| HTTPS on both domains | TLS at Nginx / Cloudflare for `api.*`; GitHub enforces HTTPS for Pages |
-| CORS allowlist | Set `ALLOWED_ORIGINS=https://wjak-official.github.io` in `.env` |
-| CSRF cookies | The frontend (`wjak-official.github.io`) and API (`api.ifreelance4u.com`) are on different eTLD+1 — **cross-site**. `SameSite=Strict` cookies are blocked in cross-site contexts. The CSRF cookie is set to `SameSite=None; Secure` in `server.js`; frontend fetches use `credentials: 'include'` |
-| API `Access-Control-Allow-Credentials` | Automatically set by the CORS config when origin matches |
-| HSTS | Set `HSTS_MAX_AGE=31536000`, `HSTS_INCLUDE_SUBDOMAINS=true` in `.env` |
+
 
 ### Security verification commands
 

@@ -163,7 +163,11 @@ class ContactFormHandler {
         window.setTimeout(() => {
             this.disableSubmit(false);
             this.showMessage('Demo only: no message was sent or stored. This form is here to preview the portfolio experience.', 'info');
-        }, previewDelayMs);
+const previewDelayMs = 500;
+window.setTimeout(() => {
+this.disableSubmit(false);
+this.showMessage('Demo only: no message was sent or stored. This form is here to preview the portfolio experience.', 'info');  
+      }, previewDelayMs);
     }
 
     init() {
