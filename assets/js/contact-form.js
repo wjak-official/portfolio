@@ -90,7 +90,7 @@ class ContactFormHandler {
         const challengeInput = this.formElement.querySelector('[name="challenge"]');
         if (!challengeInput) return true; // field absent — skip check
         const answer = parseInt(challengeInput.value, 10);
-        return !isNaN(answer) && answer === (this.challengeA + this.challengeB);
+        return !isNaN(answer) && answer >= 0 && answer === (this.challengeA + this.challengeB);
     }
 
     // -------------------------------------------------------------------------
@@ -458,7 +458,7 @@ class ContactFormHandler {
         if (response.status === 403) {
             const freshToken = await this.fetchCsrfToken();
             if (!freshToken) {
-                throw new Error('Session expired. Please refresh the page and try again.');
+                throw new Error('Unable to refresh security token. Please check your connection and try again.');
             }
             response = await makeRequest(freshToken);
         }

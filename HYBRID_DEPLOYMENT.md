@@ -329,9 +329,9 @@ be set client-side and require an edge/proxy layer:
 curl -c /tmp/csrf_cookies.txt -sv https://api.ifreelance4u.com/api/csrf-token 2>&1 \
   | grep -E 'csrfToken|set-cookie|< HTTP'
 
-# 2. Submit a valid contact request (uses the cookie from step 1)
+# 2. Submit a valid contact request (uses the cookie from step 1; requires jq)
 TOKEN=$(curl -c /tmp/csrf_cookies.txt -s https://api.ifreelance4u.com/api/csrf-token \
-  | python3 -c "import sys,json; print(json.load(sys.stdin)['csrfToken'])")
+  | jq -r '.csrfToken')
 curl -b /tmp/csrf_cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: $TOKEN" \

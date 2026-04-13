@@ -28,8 +28,9 @@
   # (defence against clickjacking; works in tandem with CSP frame-ancestors)
   X-Frame-Options: DENY
 
-  # Enforce HTTPS for one year; include all subdomains
-  # Only sent over HTTPS connections — safe to include here
+  # Enforce HTTPS for one year; include all subdomains.
+  # Browsers enforce this header only when the current request was served over HTTPS;
+  # it is silently ignored on plain HTTP — safe to include here unconditionally.
   Strict-Transport-Security: max-age=31536000; includeSubDomains
 
   # Restrict browser feature access to minimum required

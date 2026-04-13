@@ -329,8 +329,8 @@ curl -sI https://uat.ifreelance4u.com | grep -i strict-transport
 curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token
 # Expected: {"csrfToken":"<token>"}  +  Set-Cookie: csrf-token=...
 
-# Submit contact form with valid CSRF (replace TOKEN and COOKIE_VALUE)
-TOKEN=$(curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token | python3 -c "import sys,json; print(json.load(sys.stdin)['csrfToken'])")
+# Submit contact form with valid CSRF (requires jq; install with: apt install jq / brew install jq)
+TOKEN=$(curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token | jq -r '.csrfToken')
 curl -b /tmp/cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: $TOKEN" \
