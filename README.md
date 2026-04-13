@@ -308,11 +308,15 @@ This project applies defence-in-depth at multiple layers:
 
 1. **HTTPS everywhere** — both the static Pages domain and `api.ifreelance4u.com` must be  
    served over TLS.  Set `FORCE_HTTPS=true` in `.env` and terminate TLS at Nginx / Cloudflare.
-2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://wjak-official.github.io,https://uat.ifreelance4u.com`  
-   (or your custom domain) in `.env`.  Never use `*` on the API.
-3. **CSRF cookies** — the double-submit cookie (`csrf-token`) is `SameSite=Strict` in  
-   production.  For cross-origin requests (Pages domain → API domain) the fetch calls must  
-   include `credentials: 'include'` and the API must set `Access-Control-Allow-Credentials: true`.
+2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://wjak-official.github.io`  
+   in `.env`.  Never use `*` on the API.
+3. **CSRF cookies** — the static frontend (`wjak-official.github.io`) and the API  
+   (`api.ifreelance4u.com`) are on different eTLD+1, making every request **cross-site**.  
+   `SameSite=Strict` cookies are blocked by browsers in cross-site contexts, so the CSRF  
+   cookie must be `SameSite=None; Secure` (set in `server.js`).  Frontend fetches must use  
+   `credentials: 'include'` and the API must set `Access-Control-Allow-Credentials: true`.  
+   > **Note:** `SameSite=None` requires the cookie to be sent over HTTPS (`Secure` flag).  
+   > Never use `SameSite=None` on a plain HTTP deployment.
 4. **HSTS** — configure `HSTS_MAX_AGE=31536000` and `HSTS_INCLUDE_SUBDOMAINS=true` once  
    HTTPS is stable.  Only add to the HSTS preload list after extensive testing.
 
@@ -320,10 +324,10 @@ This project applies defence-in-depth at multiple layers:
 
 ```bash
 # Check real HTTP security headers (replace with your domain)
-curl -sI https://uat.ifreelance4u.com | grep -iE 'content-security|x-frame|x-content-type|strict-transport|referrer|permissions'
+curl -sI https://wjak-official.github.io | grep -iE 'content-security|x-frame|x-content-type|strict-transport|referrer|permissions'
 
 # Verify HSTS
-curl -sI https://uat.ifreelance4u.com | grep -i strict-transport
+curl -sI https://wjak-official.github.io | grep -i strict-transport
 
 # Verify CSRF flow: fetch token (cookie must be set in response)
 curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token
@@ -337,11 +341,11 @@ curl -b /tmp/cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
   -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Hello world test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
 
 # Verify frame protection (should see DENY or frame-ancestors 'none')
-curl -sI https://uat.ifreelance4u.com | grep -i x-frame
+curl -sI https://wjak-official.github.io | grep -i x-frame
 
 # Test CORS preflight
 curl -s -X OPTIONS https://api.ifreelance4u.com/api/csrf-token \
-  -H "Origin: https://uat.ifreelance4u.com" \
+  -H "Origin: https://wjak-official.github.io" \
   -H "Access-Control-Request-Method: GET" -v 2>&1 | grep -i access-control
 ```
 

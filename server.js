@@ -109,7 +109,10 @@ const {
     cookieOptions: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
+        // SameSite=None is required when the static frontend (wjak-official.github.io)
+        // and the API (api.ifreelance4u.com) are on different eTLD+1 (cross-site).
+        // SameSite=None requires Secure=true — the flag above ensures that in production.
+        sameSite: 'none'
     },
     size: 64,
     ignoredMethods: ['GET', 'HEAD', 'OPTIONS']
