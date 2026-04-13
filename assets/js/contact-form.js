@@ -75,7 +75,7 @@ class ContactFormHandler {
         if (num1El) num1El.textContent = this.challengeA;
         if (num2El) num2El.textContent = this.challengeB;
         // Clear any previous answer
-        const challengeInput = this.formElement && this.formElement.querySelector('[name="challenge"]');
+        const challengeInput = this.formElement.querySelector('[name="challenge"]');
         if (challengeInput) {
             challengeInput.value = '';
             challengeInput.classList.remove('is-invalid');
@@ -464,8 +464,14 @@ class ContactFormHandler {
         }
 
         if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.message || 'Submission failed');
+            let errorMessage = 'Submission failed';
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorMessage;
+            } catch {
+                errorMessage = 'Server returned an invalid response';
+            }
+            throw new Error(errorMessage);
         }
 
         return await response.json();

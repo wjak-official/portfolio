@@ -212,8 +212,8 @@ app.post('/api/contact',
 
             // Validate bot challenge when the client sends the challenge fields
             if (challenge_a !== undefined && challenge_b !== undefined && challenge_answer !== undefined) {
-                const expectedAnswer = parseInt(challenge_a, 10) + parseInt(challenge_b, 10);
-                if (parseInt(challenge_answer, 10) !== expectedAnswer) {
+                const expectedAnswer = challenge_a + challenge_b;
+                if (challenge_answer !== expectedAnswer) {
                     return res.status(400).json({
                         success: false,
                         message: 'Bot challenge verification failed'
@@ -233,7 +233,7 @@ app.post('/api/contact',
             const suspiciousPatterns = [
                 /<script/i,
                 /javascript:/i,
-                /on\w+\s*=/i,
+                /on[a-zA-Z]{1,30}\s{0,10}=/i,
                 /<iframe/i,
                 /<object/i,
                 /<embed/i
