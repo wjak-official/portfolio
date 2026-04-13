@@ -2,7 +2,7 @@
 
 /**
  * Secure Contact Form Handler
- * Includes validation, sanitization, rate limiting, and CSRF protection
+ * Includes validation, sanitization, rate limiting, CSRF protection, and bot challenge.
  */
 
 class ContactFormHandler {
@@ -22,7 +22,80 @@ class ContactFormHandler {
         this.rateLimitKey = 'contact_form_submissions';
         this.maxSubmissions = 3;
         this.timeWindow = 3600000; // 1 hour in milliseconds
+        // CSRF token stored in-memory only (never persisted to storage)
+        this.csrfToken = null;
+        // Bot-challenge numbers, generated fresh on init and after each failed attempt
+        this.challengeA = 0;
+        this.challengeB = 0;
     }
+
+    // -------------------------------------------------------------------------
+    // CSRF token lifecycle
+    // -------------------------------------------------------------------------
+
+    /**
+     * Fetch a fresh CSRF token from the API and store it in memory.
+     * Includes the session cookie via credentials:'include' so the backend
+     * can issue and later validate the double-submit cookie pair.
+     *
+     * @returns {Promise<string|null>} The token string, or null on failure.
+     */
+    async fetchCsrfToken() {
+        try {
+            const response = await fetch('https://api.ifreelance4u.com/api/csrf-token', {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if (!response.ok) {
+                console.warn('CSRF token fetch failed with status:', response.status);
+                return null;
+            }
+            const data = await response.json();
+            this.csrfToken = data.csrfToken || null;
+            return this.csrfToken;
+        } catch (err) {
+            console.warn('CSRF token fetch error:', err);
+            return null;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Bot challenge
+    // -------------------------------------------------------------------------
+
+    /**
+     * Generate two random numbers (1–10) for the math challenge and update
+     * the visible labels in the form.
+     */
+    generateChallenge() {
+        this.challengeA = Math.floor(Math.random() * 10) + 1;
+        this.challengeB = Math.floor(Math.random() * 10) + 1;
+        const num1El = document.getElementById('challengeNum1');
+        const num2El = document.getElementById('challengeNum2');
+        if (num1El) num1El.textContent = this.challengeA;
+        if (num2El) num2El.textContent = this.challengeB;
+        // Clear any previous answer
+        const challengeInput = this.formElement && this.formElement.querySelector('[name="challenge"]');
+        if (challengeInput) {
+            challengeInput.value = '';
+            challengeInput.classList.remove('is-invalid');
+        }
+    }
+
+    /**
+     * Validate the user's answer to the math challenge.
+     * @returns {boolean}
+     */
+    checkChallenge() {
+        const challengeInput = this.formElement.querySelector('[name="challenge"]');
+        if (!challengeInput) return true; // field absent — skip check
+        const answer = parseInt(challengeInput.value, 10);
+        return !isNaN(answer) && answer === (this.challengeA + this.challengeB);
+    }
+
+    // -------------------------------------------------------------------------
+    // Input sanitization and validation
+    // -------------------------------------------------------------------------
 
     /**
      * Sanitize input using DOMPurify
@@ -65,6 +138,10 @@ class ContactFormHandler {
         return !ContactFormHandler.DISPOSABLE_DOMAINS.includes(domain);
     }
 
+    // -------------------------------------------------------------------------
+    // Rate limiting
+    // -------------------------------------------------------------------------
+
     /**
      * Check rate limiting
      */
@@ -95,6 +172,10 @@ class ContactFormHandler {
         localStorage.setItem(this.rateLimitKey, JSON.stringify(submissions));
     }
 
+    // -------------------------------------------------------------------------
+    // Form validation
+    // -------------------------------------------------------------------------
+
     /**
      * Validate form fields
      */
@@ -103,6 +184,9 @@ class ContactFormHandler {
         const fields = this.formElement.querySelectorAll('[required]');
         
         fields.forEach(field => {
+            // Skip the challenge input — validated separately
+            if (field.name === 'challenge') return;
+
             const value = field.value.trim();
             const feedbackElement = field.nextElementSibling;
             
@@ -176,6 +260,10 @@ class ContactFormHandler {
         return isValid;
     }
 
+    // -------------------------------------------------------------------------
+    // Honeypot
+    // -------------------------------------------------------------------------
+
     /**
      * Check honeypot field
      */
@@ -183,6 +271,10 @@ class ContactFormHandler {
         const honeypot = this.formElement.querySelector('[name="website"]');
         return !honeypot || !honeypot.value;
     }
+
+    // -------------------------------------------------------------------------
+    // UI helpers
+    // -------------------------------------------------------------------------
 
     /**
      * Show message to user
@@ -232,6 +324,10 @@ class ContactFormHandler {
         }
     }
 
+    // -------------------------------------------------------------------------
+    // Form submission
+    // -------------------------------------------------------------------------
+
     /**
      * Handle form submission
      */
@@ -241,9 +337,24 @@ class ContactFormHandler {
         // Hide previous messages
         this.hideMessage();
         
-        // Validate form
+        // Validate form fields
         if (!this.validateForm()) {
             this.showMessage('Please correct the errors in the form.', 'error');
+            return;
+        }
+
+        // Validate bot challenge
+        if (!this.checkChallenge()) {
+            const challengeInput = this.formElement.querySelector('[name="challenge"]');
+            if (challengeInput) {
+                challengeInput.classList.add('is-invalid');
+                const feedback = challengeInput.nextElementSibling;
+                if (feedback && feedback.classList.contains('invalid-feedback')) {
+                    feedback.textContent = 'Incorrect answer. Please try again.';
+                }
+            }
+            this.showMessage('Please answer the verification question correctly.', 'error');
+            this.generateChallenge();
             return;
         }
         
@@ -260,17 +371,28 @@ class ContactFormHandler {
             this.showMessage('Too many submissions. Please try again later.', 'error');
             return;
         }
+
+        // Ensure we have a CSRF token before submitting
+        if (!this.csrfToken) {
+            const token = await this.fetchCsrfToken();
+            if (!token) {
+                this.showMessage('Unable to secure your request. Please refresh the page and try again.', 'error');
+                return;
+            }
+        }
         
         // Disable submit button
         this.disableSubmit(true);
         
-        // Get form data
+        // Collect form data
         const formData = {
             name: this.sanitizeInput(this.formElement.querySelector('[name="name"]').value),
             email: this.sanitizeInput(this.formElement.querySelector('[name="email"]').value),
             subject: this.sanitizeInput(this.formElement.querySelector('[name="subject"]').value),
             message: this.sanitizeInput(this.formElement.querySelector('[name="message"]').value),
-            csrf_token: sessionStorage.getItem('csrf_token') || ''
+            challenge_a: this.challengeA,
+            challenge_b: this.challengeB,
+            challenge_answer: parseInt(this.formElement.querySelector('[name="challenge"]').value, 10)
         };
         
         try {
@@ -290,10 +412,15 @@ class ContactFormHandler {
             this.formElement.querySelectorAll('.is-invalid').forEach(el => {
                 el.classList.remove('is-invalid');
             });
+
+            // Generate a fresh challenge for the next potential submission
+            this.generateChallenge();
             
         } catch (error) {
             console.error('Form submission error:', error);
             this.showMessage('An error occurred. Please try again later or email directly.', 'error');
+            // Regenerate challenge so the user can try again
+            this.generateChallenge();
         } finally {
             // Re-enable submit button
             this.disableSubmit(false);
@@ -301,30 +428,52 @@ class ContactFormHandler {
     }
 
     /**
-     * Submit form to server
+     * Submit form data to the API.
+     * Credentials are included so the CSRF cookie is sent alongside the header.
+     * On a 403 (likely CSRF expiry) the token is refreshed and the request is
+     * retried exactly once before surfacing an error to the user.
      */
     async submitToServer(formData) {
-        const response = await fetch('https://api.ifreelance4u.com/api/contact', {
+        const makeRequest = (token) => fetch('https://api.ifreelance4u.com/api/contact', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-Token': formData.csrf_token
+                'X-CSRF-Token': token || ''
             },
             body: JSON.stringify({
                 name: formData.name,
                 email: formData.email,
                 subject: formData.subject,
-                message: formData.message
+                message: formData.message,
+                challenge_a: formData.challenge_a,
+                challenge_b: formData.challenge_b,
+                challenge_answer: formData.challenge_answer
             })
         });
 
+        let response = await makeRequest(this.csrfToken);
+
+        // On 403, attempt a single token refresh and retry
+        if (response.status === 403) {
+            const freshToken = await this.fetchCsrfToken();
+            if (!freshToken) {
+                throw new Error('Session expired. Please refresh the page and try again.');
+            }
+            response = await makeRequest(freshToken);
+        }
+
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.message || 'Submission failed');
         }
 
         return await response.json();
     }
+
+    // -------------------------------------------------------------------------
+    // Initialization
+    // -------------------------------------------------------------------------
 
     /**
      * Initialize form handler
@@ -335,13 +484,21 @@ class ContactFormHandler {
         this.messageElement = document.getElementById('formMessage');
         
         if (!this.formElement) return;
+
+        // Bootstrap CSRF token in the background so it is ready before the
+        // user submits; failures are handled gracefully at submit time.
+        this.fetchCsrfToken();
+
+        // Generate the initial bot-challenge question
+        this.generateChallenge();
         
         // Attach submit event
         this.formElement.addEventListener('submit', (e) => this.handleSubmit(e));
         
-        // Real-time validation on blur
+        // Real-time validation on blur (skip honeypot and challenge fields)
         const fields = this.formElement.querySelectorAll('[required]');
         fields.forEach(field => {
+            if (field.name === 'website' || field.name === 'challenge') return;
             field.addEventListener('blur', () => {
                 if (field.value.trim()) {
                     this.validateForm();
@@ -361,3 +518,4 @@ if (document.readyState === 'loading') {
     const handler = new ContactFormHandler();
     handler.init();
 }
+

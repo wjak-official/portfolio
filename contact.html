@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <!-- Security Headers -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://api.ifreelance4u.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://api.ifreelance4u.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com; base-uri 'self'; form-action 'self' https://api.ifreelance4u.com; upgrade-insecure-requests">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="robots" content="index, follow">
@@ -123,6 +123,22 @@
                                     <textarea class="form-control" id="message" name="message" rows="6" required minlength="10" maxlength="1000"></textarea>
                                     <div class="invalid-feedback"></div>
                                     <small class="text-muted">Minimum 10 characters, maximum 1000 characters</small>
+                                </div>
+
+                                <!-- Bot challenge (lightweight human verification) -->
+                                <div class="mb-3">
+                                    <label for="challenge" class="form-label">
+                                        Human Verification: What is
+                                        <strong><span id="challengeNum1" aria-label="first number"></span></strong>
+                                        +
+                                        <strong><span id="challengeNum2" aria-label="second number"></span></strong>?
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="number" class="form-control" id="challenge" name="challenge"
+                                           required min="0" max="20" autocomplete="off"
+                                           aria-describedby="challengeHelp">
+                                    <div id="challengeHelp" class="form-text">Enter the sum of the two numbers above.</div>
+                                    <div class="invalid-feedback"></div>
                                 </div>
 
                                 <div class="d-grid">

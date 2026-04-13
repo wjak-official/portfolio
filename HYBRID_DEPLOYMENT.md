@@ -292,6 +292,77 @@ sudo ./ssl-renew.sh renew
 ✅ **Development Friendly** - Easy to modify and test locally
 ✅ **Scalable** - Can move API to cloud later if needed
 
+## 🔐 Security Baseline for the Hybrid Architecture
+
+### GitHub Pages header limitations
+
+GitHub Pages does **not** apply custom HTTP response headers from repository files.
+The `_headers` file in this repository is only honoured when the site is served through
+a CDN/proxy layer that supports the Netlify / Cloudflare Pages `_headers` convention.
+
+For pure GitHub Pages, the `<meta http-equiv="Content-Security-Policy">` tags in each
+HTML page provide a partial, client-side CSP mitigation. The following headers **cannot**
+be set client-side and require an edge/proxy layer:
+
+- `Strict-Transport-Security` (HSTS)
+- `X-Frame-Options`
+- `X-Content-Type-Options`
+- `Referrer-Policy` (as a real header)
+- `Permissions-Policy`
+- `frame-ancestors` directive in CSP (only works as a real HTTP header)
+
+### Required setup for the hybrid static + API architecture
+
+| Requirement | Action |
+|-------------|--------|
+| HTTPS on both domains | TLS at Nginx / Cloudflare for `api.*`; GitHub enforces HTTPS for Pages |
+| CORS allowlist | Set `ALLOWED_ORIGINS=https://<your-pages-domain>` in `.env` |
+| CSRF cookies | `SameSite=Strict`; frontend fetches use `credentials: 'include'` |
+| API `Access-Control-Allow-Credentials` | Automatically set by the CORS config when origin matches |
+| HSTS | Set `HSTS_MAX_AGE=31536000`, `HSTS_INCLUDE_SUBDOMAINS=true` in `.env` |
+
+### Security verification commands
+
+```bash
+# 1. Verify CSRF token flow
+#    The response must set a Set-Cookie header alongside the JSON token.
+curl -c /tmp/csrf_cookies.txt -sv https://api.ifreelance4u.com/api/csrf-token 2>&1 \
+  | grep -E 'csrfToken|set-cookie|< HTTP'
+
+# 2. Submit a valid contact request (uses the cookie from step 1)
+TOKEN=$(curl -c /tmp/csrf_cookies.txt -s https://api.ifreelance4u.com/api/csrf-token \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['csrfToken'])")
+curl -b /tmp/csrf_cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $TOKEN" \
+  -d '{"name":"Test User","email":"test@example.com","subject":"general","message":"Integration test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
+
+# 3. Verify CORS preflight is accepted for the Pages origin
+curl -sv -X OPTIONS https://api.ifreelance4u.com/api/csrf-token \
+  -H "Origin: https://wjak-official.github.io" \
+  -H "Access-Control-Request-Method: GET" 2>&1 \
+  | grep -i 'access-control'
+
+# 4. Check HTTP security headers on the API (Helmet-managed)
+curl -sI https://api.ifreelance4u.com/api/health \
+  | grep -iE 'x-frame|x-content-type|strict-transport|content-security|referrer'
+
+# 5. Verify frame protection on the static site
+#    (Only meaningful when served through a layer that applies _headers)
+curl -sI https://uat.ifreelance4u.com | grep -i 'x-frame\|frame-ancestors'
+
+# 6. Check HSTS on the API
+curl -sI https://api.ifreelance4u.com | grep -i strict-transport
+
+# 7. Confirm CSRF rejection works (submit without a valid token — should get 403)
+curl -s -X POST https://api.ifreelance4u.com/api/contact \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: invalid-token" \
+  -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Should be rejected"}' \
+  | python3 -m json.tool
+# Expected: {"success":false,"message":"Invalid CSRF token..."}
+```
+
 ## 🚀 Next Steps
 
 1. **Test thoroughly** - Ensure contact form works end-to-end
