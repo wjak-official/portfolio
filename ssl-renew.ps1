@@ -6,8 +6,8 @@ param(
 )
 
 # Configuration
-$DOMAIN = "api.ifreelance4u.com"
-$EMAIL = "info@ifreelance4u.com"
+$DOMAIN = "api.example.com"
+$EMAIL = "your-email@gmail.com"
 
 # Colors for output (PowerShell console colors)
 $Green = "Green"

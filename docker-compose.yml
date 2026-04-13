@@ -76,7 +76,7 @@ services:
       - ./ssl-challenge:/var/www/certbot
     networks:
       - portfolio-network
-    command: certonly --webroot --webroot-path=/var/www/certbot --email info@ifreelance4u.com --agree-tos --no-eff-email -d api.ifreelance4u.com -d www.api.ifreelance4u.com
+    command: certonly --webroot --webroot-path=/var/www/certbot --email your-email@gmail.com --agree-tos --no-eff-email -d api.example.com -d www.api.example.com
     security_opt:
       - no-new-privileges:true
 

@@ -286,10 +286,10 @@ This project applies defence-in-depth at multiple layers:
 | `base-uri` / `form-action` in CSP meta | ✅ | — |
 | `upgrade-insecure-requests` in CSP meta | ✅ | — |
 | SRI on CDN scripts/styles | ✅ | — |
-| Client-side honeypot | ✅ | — |
-| Client-side math bot challenge | ✅ | — |
-| Client-side rate limiting (localStorage) | ✅ | — |
-| CSRF token fetch + double-submit cookie | ✅ (via API) | — |
+| Client-side honeypot | ❌ | — |
+| Client-side math bot challenge | ❌ | — |
+| Client-side rate limiting (localStorage) | ❌ | — |
+| CSRF token fetch + double-submit cookie | ❌ | — |
 | **Real HTTP `Content-Security-Policy` header** | ❌ | ✅ |
 | **`X-Frame-Options: DENY`** | ❌ | ✅ |
 | **`frame-ancestors 'none'` (CSP)** | ❌ | ✅ |
@@ -306,12 +306,13 @@ This project applies defence-in-depth at multiple layers:
 
 ### DNS / HTTPS / CORS / CSRF requirements (hybrid static + API)
 
-1. **HTTPS everywhere** — both the static Pages domain and `api.ifreelance4u.com` must be  
+1. **HTTPS everywhere** — both the static Pages domain and `api.example.com` must be  
    served over TLS.  Set `FORCE_HTTPS=true` in `.env` and terminate TLS at Nginx / Cloudflare.
+   `api.example.com` is a reserved example hostname for documentation; replace it with your real API host in production.
 2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://wjak-official.github.io`  
    in `.env`.  Never use `*` on the API.
 3. **CSRF cookies** — the static frontend (`wjak-official.github.io`) and the API  
-   (`api.ifreelance4u.com`) are on different eTLD+1, making every request **cross-site**.  
+   (`api.example.com`) are on different eTLD+1, making every request **cross-site**.  
    `SameSite=Strict` cookies are blocked by browsers in cross-site contexts, so the CSRF  
    cookie must be `SameSite=None; Secure` (set in `server.js`).  Frontend fetches must use  
    `credentials: 'include'` and the API must set `Access-Control-Allow-Credentials: true`.  
@@ -330,12 +331,12 @@ curl -sI https://wjak-official.github.io | grep -iE 'content-security|x-frame|x-
 curl -sI https://wjak-official.github.io | grep -i strict-transport
 
 # Verify CSRF flow: fetch token (cookie must be set in response)
-curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token
+curl -c /tmp/cookies.txt -s https://api.example.com/api/csrf-token
 # Expected: {"csrfToken":"<token>"}  +  Set-Cookie: csrf-token=...
 
 # Submit contact form with valid CSRF (requires jq; install with: apt install jq / brew install jq)
-TOKEN=$(curl -c /tmp/cookies.txt -s https://api.ifreelance4u.com/api/csrf-token | jq -r '.csrfToken')
-curl -b /tmp/cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
+TOKEN=$(curl -c /tmp/cookies.txt -s https://api.example.com/api/csrf-token | jq -r '.csrfToken')
+curl -b /tmp/cookies.txt -s -X POST https://api.example.com/api/contact \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: $TOKEN" \
   -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Hello world test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
@@ -344,7 +345,7 @@ curl -b /tmp/cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
 curl -sI https://wjak-official.github.io | grep -i x-frame
 
 # Test CORS preflight
-curl -s -X OPTIONS https://api.ifreelance4u.com/api/csrf-token \
+curl -s -X OPTIONS https://api.example.com/api/csrf-token \
   -H "Origin: https://wjak-official.github.io" \
   -H "Access-Control-Request-Method: GET" -v 2>&1 | grep -i access-control
 ```

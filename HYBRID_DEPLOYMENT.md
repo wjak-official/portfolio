@@ -2,7 +2,9 @@
 
 This guide explains how to set up a hybrid deployment where:
 - **Static content** (HTML, CSS, JS) is served from **GitHub Pages** on `wjak-official.github.io`
-- **API backend** (Node.js) runs locally in **Docker** on `api.ifreelance4u.com` subdomain
+- **API backend** (Node.js) runs locally in **Docker** on the demo placeholder subdomain `api.example.com`
+
+> `api.example.com` is a reserved example hostname used for documentation and demo purposes. Replace it with your real API hostname before deploying a live system.
 
 ## 🏗️ Architecture Overview
 
@@ -55,7 +57,7 @@ This guide explains how to set up a hybrid deployment where:
 4. **Verify DNS Propagation**
    ```bash
    # Test DNS resolution
-   nslookup api.ifreelance4u.com
+   nslookup api.example.com
 
    # Should return your local IP address
    ```
@@ -76,7 +78,7 @@ Your router needs to forward external requests on ports 80 and 443 to your local
 #### **Test Port Forwarding:**
 ```bash
 # From external network (not your local network)
-curl -I http://api.ifreelance4u.com
+curl -I http://api.example.com
 
 # Should reach your local Docker container
 ```
@@ -145,16 +147,16 @@ sudo ./ssl-renew.sh issue
 
 ### 2. Update Static Files (Already Done)
 
-The static HTML files have been updated to call the API subdomain:
-- `main.js`: `fetch('https://api.ifreelance4u.com/api/csrf-token')`
-- `contact-form.js`: `fetch('https://api.ifreelance4u.com/api/contact')`
+The static assets now use demo-friendly placeholders:
+- `main.js`: `fetch('https://api.example.com/api/csrf-token')`
+- `contact-form.js`: demo-only preview logic with no live API submission
 
 ### 3. Deploy to GitHub Pages
 
 ```bash
 # Commit and push changes
 git add .
-git commit -m "Update API calls to use api.ifreelance4u.com subdomain"
+git commit -m "Update API calls to use the demo placeholder api.example.com"
 git push origin main
 ```
 
@@ -170,7 +172,7 @@ curl -I https://wjak-official.github.io
 ### 2. Test API Backend
 ```bash
 # Should reach your local Docker
-curl -I https://api.ifreelance4u.com/api/health
+curl -I https://api.example.com/api/health
 # Response: HTTP/2 200 (from your local Docker)
 ```
 
@@ -178,26 +180,26 @@ curl -I https://api.ifreelance4u.com/api/health
 ```bash
 # Test from GitHub Pages domain to API
 curl -X OPTIONS -H "Origin: https://wjak-official.github.io" \
-     https://api.ifreelance4u.com/api/csrf-token
+     https://api.example.com/api/csrf-token
 # Should return CORS headers allowing the origin
 ```
 
 ### 4. Test Contact Form
 1. **Visit:** `https://wjak-official.github.io`
 2. **Fill out contact form**
-3. **Submit** - should call `https://api.ifreelance4u.com/api/contact`
-4. **Check email** - should receive the contact form submission
+3. **Submit** - in a live deployment this would call `https://api.example.com/api/contact`
+4. **Check backend behavior** - in a live deployment, confirm the submission is processed as expected
 
 ## 🔧 Troubleshooting
 
 ### DNS Issues
 ```bash
 # Check DNS resolution
-nslookup api.ifreelance4u.com
+nslookup api.example.com
 
 # Check if ports are open externally
-telnet api.ifreelance4u.com 80
-telnet api.ifreelance4u.com 443
+telnet api.example.com 80
+telnet api.example.com 443
 ```
 
 ### Port Forwarding Issues
@@ -214,13 +216,13 @@ curl http://YOUR_LOCAL_IP/api/health
 ```bash
 # Check CORS headers
 curl -H "Origin: https://wjak-official.github.io" \
-     -v https://api.ifreelance4u.com/api/csrf-token
+     -v https://api.example.com/api/csrf-token
 ```
 
 ### SSL Issues
 ```bash
 # Check SSL certificate
-openssl s_client -connect api.ifreelance4u.com:443 -servername api.ifreelance4u.com
+openssl s_client -connect api.example.com:443 -servername api.example.com
 
 # Renew certificate if needed
 sudo ./ssl-renew.sh renew
@@ -261,7 +263,7 @@ Make sure you're running the right command in the right shell:
 ### Health Checks
 ```bash
 # Monitor API health
-curl https://api.ifreelance4u.com/api/health
+curl https://api.example.com/api/health
 
 # Check Docker containers
 docker-compose ps
@@ -326,25 +328,25 @@ be set client-side and require an edge/proxy layer:
 ```bash
 # 1. Verify CSRF token flow
 #    The response must set a Set-Cookie header alongside the JSON token.
-curl -c /tmp/csrf_cookies.txt -sv https://api.ifreelance4u.com/api/csrf-token 2>&1 \
+curl -c /tmp/csrf_cookies.txt -sv https://api.example.com/api/csrf-token 2>&1 \
   | grep -E 'csrfToken|set-cookie|< HTTP'
 
 # 2. Submit a valid contact request (uses the cookie from step 1; requires jq)
-TOKEN=$(curl -c /tmp/csrf_cookies.txt -s https://api.ifreelance4u.com/api/csrf-token \
+TOKEN=$(curl -c /tmp/csrf_cookies.txt -s https://api.example.com/api/csrf-token \
   | jq -r '.csrfToken')
-curl -b /tmp/csrf_cookies.txt -s -X POST https://api.ifreelance4u.com/api/contact \
+curl -b /tmp/csrf_cookies.txt -s -X POST https://api.example.com/api/contact \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: $TOKEN" \
   -d '{"name":"Test User","email":"test@example.com","subject":"general","message":"Integration test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
 
 # 3. Verify CORS preflight is accepted for the Pages origin
-curl -sv -X OPTIONS https://api.ifreelance4u.com/api/csrf-token \
+curl -sv -X OPTIONS https://api.example.com/api/csrf-token \
   -H "Origin: https://wjak-official.github.io" \
   -H "Access-Control-Request-Method: GET" 2>&1 \
   | grep -i 'access-control'
 
 # 4. Check HTTP security headers on the API (Helmet-managed)
-curl -sI https://api.ifreelance4u.com/api/health \
+curl -sI https://api.example.com/api/health \
   | grep -iE 'x-frame|x-content-type|strict-transport|content-security|referrer'
 
 # 5. Verify frame protection on the static site
@@ -352,10 +354,10 @@ curl -sI https://api.ifreelance4u.com/api/health \
 curl -sI https://wjak-official.github.io | grep -i 'x-frame\|frame-ancestors'
 
 # 6. Check HSTS on the API
-curl -sI https://api.ifreelance4u.com | grep -i strict-transport
+curl -sI https://api.example.com | grep -i strict-transport
 
 # 7. Confirm CSRF rejection works (submit without a valid token — should get 403)
-curl -s -X POST https://api.ifreelance4u.com/api/contact \
+curl -s -X POST https://api.example.com/api/contact \
   -H "Content-Type: application/json" \
   -H "X-CSRF-Token: invalid-token" \
   -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Should be rejected"}' \

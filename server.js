@@ -110,7 +110,7 @@ const {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         // SameSite=None is required when the static frontend (wjak-official.github.io)
-        // and the API (api.ifreelance4u.com) are on different eTLD+1 (cross-site).
+        // and the API (api.example.com) are on different eTLD+1 (cross-site).
         // SameSite=None requires Secure=true — the flag above ensures that in production.
         sameSite: 'none'
     },
