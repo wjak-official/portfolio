@@ -309,9 +309,9 @@ This project applies defence-in-depth at multiple layers:
 1. **HTTPS everywhere** — both the static Pages domain and `api.example.com` must be  
    served over TLS.  Set `FORCE_HTTPS=true` in `.env` and terminate TLS at Nginx / Cloudflare.
    `api.example.com` is a reserved example hostname for documentation; replace it with your real API host in production.
-2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://wjak-official.github.io`  
+2. **CORS allowlist** — set `ALLOWED_ORIGINS=https://yourusername.github.io/your-repo`  
    in `.env`.  Never use `*` on the API.
-3. **CSRF cookies** — the static frontend (`wjak-official.github.io`) and the API  
+3. **CSRF cookies** — the static frontend (`yourusername.github.io/your-repo`) and the API  
    (`api.example.com`) are on different eTLD+1, making every request **cross-site**.  
    `SameSite=Strict` cookies are blocked by browsers in cross-site contexts, so the CSRF  
    cookie must be `SameSite=None; Secure` (set in `server.js`).  Frontend fetches must use  
@@ -325,10 +325,10 @@ This project applies defence-in-depth at multiple layers:
 
 ```bash
 # Check real HTTP security headers (replace with your domain)
-curl -sI https://wjak-official.github.io | grep -iE 'content-security|x-frame|x-content-type|strict-transport|referrer|permissions'
+curl -sI https://yourusername.github.io/your-repo | grep -iE 'content-security|x-frame|x-content-type|strict-transport|referrer|permissions'
 
 # Verify HSTS
-curl -sI https://wjak-official.github.io | grep -i strict-transport
+curl -sI https://yourusername.github.io/your-repo | grep -i strict-transport
 
 # Verify CSRF flow: fetch token (cookie must be set in response)
 curl -c /tmp/cookies.txt -s https://api.example.com/api/csrf-token
@@ -342,11 +342,11 @@ curl -b /tmp/cookies.txt -s -X POST https://api.example.com/api/contact \
   -d '{"name":"Test","email":"test@example.com","subject":"general","message":"Hello world test message","challenge_a":3,"challenge_b":4,"challenge_answer":7}'
 
 # Verify frame protection (should see DENY or frame-ancestors 'none')
-curl -sI https://wjak-official.github.io | grep -i x-frame
+curl -sI https://yourusername.github.io/your-repo | grep -i x-frame
 
 # Test CORS preflight
 curl -s -X OPTIONS https://api.example.com/api/csrf-token \
-  -H "Origin: https://wjak-official.github.io" \
+  -H "Origin: https://yourusername.github.io/your-repo" \
   -H "Access-Control-Request-Method: GET" -v 2>&1 | grep -i access-control
 ```
 

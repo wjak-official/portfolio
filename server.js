@@ -109,7 +109,7 @@ const {
     cookieOptions: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        // SameSite=None is required when the static frontend (wjak-official.github.io)
+        // SameSite=None is required when the static frontend (yourusername.github.io/your-repo)
         // and the API (api.example.com) are on different eTLD+1 (cross-site).
         // SameSite=None requires Secure=true — the flag above ensures that in production.
         sameSite: 'none'
@@ -210,15 +210,53 @@ app.post('/api/contact',
 
             const { name, email, subject, message, challenge_a, challenge_b, challenge_answer } = req.body;
 
-            // Validate bot challenge (required fields — bypass is rejected by validation above)
-            const expectedAnswer = parseInt(challenge_a, 10) + parseInt(challenge_b, 10);
-            if (parseInt(challenge_answer, 10) !== expectedAnswer) {
+            // Validate bot challenge in a backward-compatible way while clients roll out support.
+            // If CONTACT_CHALLENGE_REQUIRED=true, all requests must include valid challenge fields.
+            const challengeRequired = process.env.CONTACT_CHALLENGE_REQUIRED === 'true';
+            const hasChallengeA = challenge_a !== undefined && challenge_a !== null && challenge_a !== '';
+            const hasChallengeB = challenge_b !== undefined && challenge_b !== null && challenge_b !== '';
+            const hasChallengeAnswer = challenge_answer !== undefined && challenge_answer !== null && challenge_answer !== '';
+            const hasAnyChallengeFields = hasChallengeA || hasChallengeB || hasChallengeAnswer;
+            const hasAllChallengeFields = hasChallengeA && hasChallengeB && hasChallengeAnswer;
+
+            if (challengeRequired && !hasAllChallengeFields) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Bot challenge verification failed'
+                    message: 'Bot challenge is required'
                 });
             }
 
+            if (hasAnyChallengeFields && !hasAllChallengeFields) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Incomplete bot challenge payload'
+                });
+            }
+
+            if (hasAllChallengeFields) {
+                const parsedChallengeA = parseInt(challenge_a, 10);
+                const parsedChallengeB = parseInt(challenge_b, 10);
+                const parsedChallengeAnswer = parseInt(challenge_answer, 10);
+
+                if (
+                    Number.isNaN(parsedChallengeA) ||
+                    Number.isNaN(parsedChallengeB) ||
+                    Number.isNaN(parsedChallengeAnswer)
+                ) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Bot challenge verification failed'
+                    });
+                }
+
+                const expectedAnswer = parsedChallengeA + parsedChallengeB;
+                if (parsedChallengeAnswer !== expectedAnswer) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Bot challenge verification failed'
+                    });
+                }
+            }
             // Additional server-side validation
             if (!name || !email || !subject || !message) {
                 return res.status(400).json({

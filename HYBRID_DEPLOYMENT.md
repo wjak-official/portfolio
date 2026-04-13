@@ -1,7 +1,7 @@
 # Hybrid Deployment Guide: GitHub Pages + Docker API
 
 This guide explains how to set up a hybrid deployment where:
-- **Static content** (HTML, CSS, JS) is served from **GitHub Pages** on `wjak-official.github.io`
+- **Static content** (HTML, CSS, JS) is served from **GitHub Pages** on `yourusername.github.io/your-repo`
 - **API backend** (Node.js) runs locally in **Docker** on the demo placeholder subdomain `api.example.com`
 
 > `api.example.com` is a reserved example hostname used for documentation and demo purposes. Replace it with your real API hostname before deploying a live system.
@@ -12,8 +12,8 @@ This guide explains how to set up a hybrid deployment where:
 ┌─────────────────┐    ┌─────────────────┐
 │   GitHub Pages  │    │   Docker API    │
 │                 │    │                 │
-│ wjak-official  │────│ api.ifreelance  │
-│ .github.io     │    │ 4u.com          │
+│ yourusername    │────│ api.example.com │
+│ .github.io/your-repo │    │                 │
 │                 │    │                 │
 │ - Static HTML   │    │ - CSRF tokens   │
 │ - CSS/JS        │    │ - Contact form  │
@@ -165,7 +165,7 @@ git push origin main
 ### 1. Test Static Site
 ```bash
 # Should load from GitHub Pages
-curl -I https://wjak-official.github.io
+curl -I https://yourusername.github.io/your-repo
 # Response: HTTP/2 200 (from GitHub)
 ```
 
@@ -179,14 +179,14 @@ curl -I https://api.example.com/api/health
 ### 3. Test CORS
 ```bash
 # Test from GitHub Pages domain to API
-curl -X OPTIONS -H "Origin: https://wjak-official.github.io" \
+curl -X OPTIONS -H "Origin: https://yourusername.github.io/your-repo" \
      https://api.example.com/api/csrf-token
 # Should return CORS headers allowing the origin
 ```
 
 ### 4. Test Contact Form
-1. **Visit:** `https://wjak-official.github.io`
-2. **Fill out contact form**
+1. **Open the contact form** at `https://yourusername.github.io/your-repo/contact.html`
+2. **Fill out the form** with test data and solve the math challenge.Try to input wrong answer to see the validation in action, you can also try to input incorrect formats in other fields and see how the form handles it.
 3. **Submit** - in a live deployment this would call `https://api.example.com/api/contact`
 4. **Check backend behavior** - in a live deployment, confirm the submission is processed as expected
 
@@ -215,7 +215,7 @@ curl http://YOUR_LOCAL_IP/api/health
 ### CORS Issues
 ```bash
 # Check CORS headers
-curl -H "Origin: https://wjak-official.github.io" \
+curl -H "Origin: https://yourusername.github.io/your-repo" \
      -v https://api.example.com/api/csrf-token
 ```
 
@@ -311,7 +311,7 @@ be set client-side and require an edge/proxy layer:
 - `X-Content-Type-Options`
 - `Referrer-Policy` (as a real header)
 - `Permissions-Policy`| HTTPS on both domains | TLS at Nginx / Cloudflare for `api.*`; GitHub enforces HTTPS for Pages |
-| CORS allowlist | Set `ALLOWED_ORIGINS=https://wjak-official.github.io` in `.env` |
+| CORS allowlist | Set `ALLOWED_ORIGINS=https://yourusername.github.io/your-repo` in `.env` |
 | CSRF cookies | The CSRF cookie is set to `SameSite=None; Secure` in `server.js`; frontend fetches use `credentials: 'include'` |
 | API `Access-Control-Allow-Credentials` | Automatically set by the CORS config when origin matches |
 | HSTS | Set `HSTS_MAX_AGE=31536000`, `HSTS_INCLUDE_SUBDOMAINS=true` in `.env` |
@@ -341,7 +341,7 @@ curl -b /tmp/csrf_cookies.txt -s -X POST https://api.example.com/api/contact \
 
 # 3. Verify CORS preflight is accepted for the Pages origin
 curl -sv -X OPTIONS https://api.example.com/api/csrf-token \
-  -H "Origin: https://wjak-official.github.io" \
+  -H "Origin: https://yourusername.github.io/your-repo" \
   -H "Access-Control-Request-Method: GET" 2>&1 \
   | grep -i 'access-control'
 
@@ -351,7 +351,7 @@ curl -sI https://api.example.com/api/health \
 
 # 5. Verify frame protection on the static site
 #    (Only meaningful when served through a layer that applies _headers)
-curl -sI https://wjak-official.github.io | grep -i 'x-frame\|frame-ancestors'
+curl -sI https://yourusername.github.io/your-repo | grep -i 'x-frame\|frame-ancestors'
 
 # 6. Check HSTS on the API
 curl -sI https://api.example.com | grep -i strict-transport
